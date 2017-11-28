@@ -103,6 +103,7 @@ export default {
   Filter: '\uE060',
   NewWindow: '\uE061',
   Link: '\uE062',
+  DisabledLink: '\uE0DA',
   GooglePlus: '\uE063',
   DocumentTypeRtf: '\uE064',
   ArrowChevronLeft: '\uE065',

@@ -222,7 +222,10 @@ const MAP = {
   'ok-double': '\ue0d5',
 
   // 24.03.2017
-  'flash-drive': '\ue0d7'
+  'flash-drive': '\ue0d7',
+
+  //28.11.2017
+  'disabled-link': '\ue0da'
 };
 
 function getNewIconName(name) {
