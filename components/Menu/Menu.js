@@ -15,7 +15,7 @@ type MenuItemElement = ?React.Element<Class<MenuItem>>;
 type Props = {
   children?: React.ChildrenArray<MenuItemElement>,
   hasShadow: boolean,
-  maxHeight: number,
+  maxHeight: number | string,
   onItemClick?: () => void,
   width?: number | string
 };
