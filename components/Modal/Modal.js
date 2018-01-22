@@ -104,22 +104,23 @@ class Modal extends React.Component<Props, State> {
     );
   }
 
+  renderClose() {
+    return (
+      <a
+        href="javascript:"
+        className={classNames(
+          styles.close,
+          this.props.disableClose && styles.disabled
+        )}
+        onClick={this._requestClose}
+      >
+        ×
+      </a>
+    );
+  }
+
   render() {
-    let close = null;
-    if (!this.props.noClose) {
-      close = (
-        <a
-          href="javascript:"
-          className={classNames(
-            styles.close,
-            this.props.disableClose && styles.disabled
-          )}
-          onClick={this._requestClose}
-        >
-          ×
-        </a>
-      );
-    }
+    const close: React.Node = !this.props.noClose ? this.renderClose() : null;
 
     let hasHeader = false;
     const children = React.Children.map(this.props.children, child => {
@@ -290,13 +291,11 @@ class Modal extends React.Component<Props, State> {
     }
 
     if (hasScroll) {
-      !this.state.horizontalScroll &&
-      this.setState({ horizontalScroll: true });
+      !this.state.horizontalScroll && this.setState({ horizontalScroll: true });
     } else {
-      this.state.horizontalScroll &&
-      this.setState({ horizontalScroll: false });
+      this.state.horizontalScroll && this.setState({ horizontalScroll: false });
     }
-  }
+  };
 }
 
 type HeaderProps = {
@@ -356,13 +355,15 @@ class Footer extends React.Component<FooterProps> {
     });
 
     return (
-      <Sticky side="bottom" offset={this.props.horizontalScroll ? this._scrollbarWidth : 0}>
+      <Sticky
+        side="bottom"
+        offset={this.props.horizontalScroll ? this._scrollbarWidth : 0}
+      >
         {fixed => (
-            <div className={classNames(names, fixed && styles.fixedFooter)}>
-              {this.props.children}
-            </div>
-          )
-        }
+          <div className={classNames(names, fixed && styles.fixedFooter)}>
+            {this.props.children}
+          </div>
+        )}
       </Sticky>
     );
   }
