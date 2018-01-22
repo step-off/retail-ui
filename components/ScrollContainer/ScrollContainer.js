@@ -79,7 +79,11 @@ export default class ScrollContainer extends React.Component {
         onMouseLeave={this._handleMouseLeave}
       >
         {scroll}
-        <div ref={this._refInner} className={styles.inner} style={innerStyle}>
+        <div
+          ref={this._refInner}
+          className={styles.inner}
+          style={innerStyle}
+        >
           {this.props.children}
         </div>
       </div>
@@ -90,6 +94,10 @@ export default class ScrollContainer extends React.Component {
     this._reflow();
 
     events.addEventListener(this._inner, 'scroll', this._handleNativeScroll);
+    
+    if (this.props.preventWindowScroll) {
+      events.addEventListener(this._inner, 'mousewheel', this._handleInnerWheel);
+    }
   }
 
   componentDidUpdate() {
@@ -98,14 +106,22 @@ export default class ScrollContainer extends React.Component {
 
   componentWillUnmount() {
     events.removeEventListener(this._inner, 'scroll', this._handleNativeScroll);
+
+    if (this.props.preventWindowScroll) {
+      events.removeEventListener(this._inner, 'mousewheel', this._handleInnerWheel);
+    }
   }
 
   _refInner = el => {
     this._inner = el;
   };
 
-  _handleNativeScroll = () => {
+  _handleNativeScroll = (event) => {
     this._reflow();
+    if (this.props.preventWindowScroll) {
+      event.preventDefault();
+      return;
+    }
     LayoutEvents.emit();
   };
 
@@ -199,6 +215,22 @@ export default class ScrollContainer extends React.Component {
     event.preventDefault();
   };
 
+  _handleInnerWheel = event => {
+    const inner = this._inner;
+
+    if (
+      event.deltaY > 0 &&
+      inner.scrollHeight <= inner.scrollTop + inner.offsetHeight
+    ) {
+      event.preventDefault();
+      return false;
+    }
+    if (event.deltaY < 0 && inner.scrollTop <= 0) {
+      event.preventDefault();
+      return false;
+    }
+  }
+
   _handleMouseMove = event => {
     const right =
       event.currentTarget.getBoundingClientRect().right - event.pageX;
@@ -218,5 +250,9 @@ export default class ScrollContainer extends React.Component {
 
 ScrollContainer.propTypes = {
   invert: PropTypes.bool,
-  maxHeight: PropTypes.number
+  maxHeight: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
+  ]),
+  preventWindowScroll: PropTypes.bool
 };

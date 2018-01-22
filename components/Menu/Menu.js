@@ -17,7 +17,8 @@ type Props = {
   hasShadow: boolean,
   maxHeight: number,
   onItemClick?: () => void,
-  width?: number | string
+  width?: number | string,
+  preventWindowScroll?: boolean
 };
 
 type State = {
@@ -47,6 +48,8 @@ export default class Menu extends React.Component<Props, State> {
       return null;
     }
 
+    const doNotPreventWindowScroll = this.props.preventWindowScroll === false;
+
     return (
       <div
         className={cn(styles.root, this.props.hasShadow && styles.shadow)}
@@ -55,6 +58,7 @@ export default class Menu extends React.Component<Props, State> {
         <ScrollContainer
           ref={this._refScrollContainer}
           maxHeight={this.props.maxHeight}
+          preventWindowScroll={!doNotPreventWindowScroll}
         >
           {React.Children.map(this.props.children, (child, index) => {
             const isMenuItem = child && child.type.__MENU_ITEM__;
