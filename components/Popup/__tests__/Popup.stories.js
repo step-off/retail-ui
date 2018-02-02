@@ -5,7 +5,7 @@ import { storiesOf } from '@storybook/react';
 import Popup from '../Popup';
 
 storiesOf('Popup', module)
-  .add('All pin opened', () => (
+  .add('All pin opened', () =>
     <div style={{ transform: 'translate(50%, 15%)' }}>
       <table>
         <tbody>
@@ -71,53 +71,51 @@ storiesOf('Popup', module)
         </tbody>
       </table>
     </div>
-  ))
-  .add('Positioning', () => (
+  )
+  .add('Positioning', () =>
     <div>
       <table>
         <tbody>
           {new Array(6 * 5).fill(0).map((x, i) => {
-            return Math.floor(i / 6) % 2 ? (
-              <tr>
-                <td>
-                  <div style={{ height: '40px' }} />
-                </td>
-              </tr>
-            ) : (
-              <tr>
-                <td>
-                  <PopupWithPositions />
-                </td>
-                <td style={{ width: '50%', minWidth: '300px' }} />
-                <td>
-                  <PopupWithPositions />
-                </td>
-                <td style={{ width: '50%', minWidth: '300px' }} />
-                <td>
-                  <PopupWithPositions />
-                </td>
-              </tr>
-            );
+            return Math.floor(i / 6) % 2
+              ? <tr>
+                  <td>
+                    <div style={{ height: '40px' }} />
+                  </td>
+                </tr>
+              : <tr>
+                  <td>
+                    <PopupWithPositions />
+                  </td>
+                  <td style={{ width: '50%', minWidth: '300px' }} />
+                  <td>
+                    <PopupWithPositions />
+                  </td>
+                  <td style={{ width: '50%', minWidth: '300px' }} />
+                  <td>
+                    <PopupWithPositions />
+                  </td>
+                </tr>;
           })}
         </tbody>
       </table>
     </div>
-  ))
-  .add('Hint', () => (
+  )
+  .add('Hint', () =>
     <div style={{ transform: 'translate(250%, 200%)' }}>
       <Hint
         positions={['top center', 'right top', 'bottom center', 'left middle']}
         margin={20}
       />
     </div>
-  ))
-  .add('Toast', () => (
+  )
+  .add('Toast', () =>
     <div style={{ transform: 'translate(250%, 200%)' }}>
       <Toast
         positions={['top center', 'right top', 'bottom center', 'left middle']}
       />
     </div>
-  ));
+  );
 
 class AlwaysOpened extends Component<*, *> {
   anchor: ?HTMLElement;
@@ -149,7 +147,7 @@ class AlwaysOpened extends Component<*, *> {
         >
           x
         </div>
-        {this.state.anchor && (
+        {this.state.anchor &&
           <Popup
             onClickOutside={this._clickHandler}
             onFocusOutside={this._clickHandler}
@@ -173,8 +171,7 @@ class AlwaysOpened extends Component<*, *> {
             >
               Text
             </div>
-          </Popup>
-        )}
+          </Popup>}
       </div>
     );
   }
@@ -217,9 +214,10 @@ class PopupWithPositions extends Component<*, any> {
             background: 'grey'
           }}
         />
-        {this.state.anchor && (
+        {this.state.anchor &&
           <Popup
-            onCloseRequest={this._clickHandler}
+            onClickOutside={this._clickHandler}
+            onFocusOutside={this._clickHandler}
             anchorElement={this.state.anchor}
             popupOffset={0}
             opened={this.state.opened}
@@ -234,8 +232,7 @@ class PopupWithPositions extends Component<*, any> {
             <div style={{ padding: '10px 20px', fontSize: '30px' }}>
               Placeholder
             </div>
-          </Popup>
-        )}
+          </Popup>}
       </div>
     );
   }
@@ -245,7 +242,7 @@ class PopupWithPositions extends Component<*, any> {
   };
 
   _handleClick = () => {
-    this.setState(state => ({ opened: !state.opened }));
+    this.setState({ opened: true });
   };
 
   _clickHandler = e => {
@@ -276,7 +273,7 @@ class Hint extends Component<*, any> {
         >
           Hello
         </div>
-        {this.state.anchor && (
+        {this.state.anchor &&
           <Popup
             onClickOutside={this._clickHandler}
             onFocusOutside={this._clickHandler}
@@ -292,8 +289,7 @@ class Hint extends Component<*, any> {
             pinOffset={7}
           >
             <span style={{ color: '#fefefe' }}>WorldWorldWorldWorldWorld</span>
-          </Popup>
-        )}
+          </Popup>}
       </div>
     );
   }
@@ -324,7 +320,7 @@ class Toast extends Component<*, *> {
         >
           Hello
         </div>
-        {this.state.anchor && (
+        {this.state.anchor &&
           <Popup
             onClickOutside={this._clickHandler}
             onFocusOutside={this._clickHandler}
@@ -338,8 +334,7 @@ class Toast extends Component<*, *> {
             pinOffset={7}
           >
             <span style={{ color: '#fefefe' }}>WorldWorldWorldWorldWorld</span>
-          </Popup>
-        )}
+          </Popup>}
       </div>
     );
   }

@@ -6,7 +6,7 @@ import Toast from './Toast';
 import type { Action } from './Toast';
 
 class ToastStatic {
-  static node: HTMLDivElement;
+  static node: ?HTMLDivElement = null;
   static instance: ?Toast = null;
 
   static push = function(notification: string, action?: Action) {

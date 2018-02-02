@@ -9,15 +9,6 @@ module.exports = {
     'transform-es3-member-expression-literals',
     'transform-class-properties',
     'transform-object-rest-spread',
-    [
-      'transform-runtime',
-      {
-        helpers: false,
-        polyfill: false,
-        regenerator: true,
-        moduleName: 'babel-runtime'
-      }
-    ],
     path.resolve(__dirname, '../babel/imports-less-to-css')
   ]
 };

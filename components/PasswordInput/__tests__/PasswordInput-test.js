@@ -50,7 +50,7 @@ describe('PasswordInput', () => {
 
   it('has not capsLockEnabled property in state', () => {
     const component = setup();
-    expect(component.state().capsLockEnabled).toBeFalsy();
+    expect(component.state().capsLockEnabled).toBe(undefined);
   });
 
   it('has capsLockEnabled = null if passed detectCapsLock prop', () => {
@@ -58,16 +58,15 @@ describe('PasswordInput', () => {
     expect(component.state().capsLockEnabled).toBe(null);
   });
 
-  // https://github.com/airbnb/enzyme/issues/1163
-  // FIXME when issue would be closed
-  xit('should at first render CapsLock label then hide it', () => {
+  it('should at first render CapsLock label then hide it', () => {
     const component = setup({ detectCapsLock: true });
+    const input = component.find('input');
+    input.simulate('keyPress', { keyCode: 65 }); // key: a
+    input.simulate('keyPress', { keyCode: 20 }); // key: CapsLock
 
-    component.find('input').simulate('keyPress', { keyCode: 65 }); // a
-    component.find('input').simulate('keyPress', { keyCode: 20 }); // CapsLock
     expect(component.find(`.${styles.capsLockDetector}`)).toHaveLength(1);
 
-    component.find('input').simulate('keydown', { keyCode: 20 }); // CapsLock
+    input.simulate('keydown', { keyCode: 20 }); // key: CapsLock
 
     expect(component.find(`.${styles.capsLockDetector}`)).toHaveLength(0);
   });

@@ -21,7 +21,6 @@ type Props<T> = {
   opened?: boolean,
   openButton?: boolean,
   placeholder?: string,
-  size: 'small' | 'medium' | 'large',
   textValue?: string,
   totalCount?: number,
   value?: ?T,
@@ -49,13 +48,12 @@ type Props<T> = {
 
 class ComboBoxView<T> extends React.Component<Props<T>> {
   static defaultProps = {
-    renderItem: (x: *, i: *) => x,
+    renderItem: (x, i) => x,
     renderNotFound: () => 'Не найдено',
-    renderValue: (x: *) => x,
+    renderValue: x => x,
     onClickOutside: () => {},
     onFocusOutside: () => {},
     onChange: () => {},
-    size: 'small',
     width: (250: string | number)
   };
 
@@ -87,35 +85,14 @@ class ComboBoxView<T> extends React.Component<Props<T>> {
       onMouseOver,
       openButton,
       opened,
-      size,
       width
     } = this.props;
 
     const input = this.renderInput();
     const menu = this.renderMenu();
 
-    const topOffsets = {
-      spinner: 6,
-      arrow: 15
-    };
-    if (size === 'medium') {
-      topOffsets.spinner += 2;
-      topOffsets.arrow += 2;
-    }
-    if (size === 'large') {
-      topOffsets.spinner += 4;
-      topOffsets.arrow += 4;
-    }
-
     const spinner = (
-      <span
-        style={{
-          position: 'absolute',
-          top: topOffsets.spinner,
-          right: 5,
-          zIndex: 10
-        }}
-      >
+      <span style={{ position: 'absolute', top: 6, right: 5, zIndex: 10 }}>
         <Spinner type="mini" caption="" dimmed />
       </span>
     );
@@ -128,7 +105,7 @@ class ComboBoxView<T> extends React.Component<Props<T>> {
           borderTopColor: '#a6a6a6',
           position: 'absolute',
           right: 8,
-          top: topOffsets.arrow,
+          top: 15,
           zIndex: 2,
           pointerEvents: 'none'
         }}
@@ -153,15 +130,14 @@ class ComboBoxView<T> extends React.Component<Props<T>> {
           {input}
           {spinnerIsShown && spinner}
           {arrowIsShown && arrow}
-          {opened && (
+          {opened &&
             <DropdownContainer
               align={menuAlign}
               getParent={() => findDOMNode(this)}
               offsetY={1}
             >
               {menu}
-            </DropdownContainer>
-          )}
+            </DropdownContainer>}
         </label>
       </RenderLayer>
     );
@@ -197,7 +173,9 @@ class ComboBoxView<T> extends React.Component<Props<T>> {
     if ((items == null || items.length === 0) && renderNotFound) {
       return (
         <Menu ref={refMenu}>
-          <MenuItem disabled>{renderNotFound()}</MenuItem>
+          <MenuItem disabled>
+            {renderNotFound()}
+          </MenuItem>
         </Menu>
       );
     }
@@ -256,7 +234,6 @@ class ComboBoxView<T> extends React.Component<Props<T>> {
       openButton,
       placeholder,
       renderValue,
-      size,
       textValue,
       value,
       warning
@@ -275,7 +252,6 @@ class ComboBoxView<T> extends React.Component<Props<T>> {
           onKeyDown={onInputKeyDown}
           placeholder={placeholder}
           width="100%"
-          size={size}
           ref={this.refInput}
           warning={warning}
         />
@@ -289,13 +265,12 @@ class ComboBoxView<T> extends React.Component<Props<T>> {
         padRight={openButton}
         disabled={disabled}
         warning={warning}
-        size={size}
       >
-        {value ? (
-          renderValue(value)
-        ) : (
-          <span style={{ color: 'gray' }}>{placeholder}</span>
-        )}
+        {value
+          ? renderValue(value)
+          : <span style={{ color: 'gray' }}>
+              {placeholder}
+            </span>}
       </InputLikeText>
     );
   }

@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import Calendar from './Calendar';
 import DateSelect from '../DateSelect';
+import Icon from '../Icon';
 
 import styles from './Picker.less';
 
@@ -11,6 +12,7 @@ type Props = {
   maxYear?: number,
   minYear?: number,
   value: ?Date,
+  iconRef: ?Icon,
   onPick: (date: Date) => void
 };
 
@@ -32,7 +34,7 @@ export default class Picker extends React.Component<Props, State> {
   render() {
     const { date } = this.state;
     return (
-      <div className={styles.root} onMouseDown={e => e.preventDefault()}>
+      <div className={styles.root}>
         <div className={styles.monthYear}>
           <DateSelect
             type="year"
@@ -62,13 +64,6 @@ export default class Picker extends React.Component<Props, State> {
 
   componentDidMount() {
     this._mounted = true;
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (this.props.value && +prevProps.value !== +this.props.value) {
-      this.setState({ date: this.props.value });
-      this.refs.calendar.moveToDate(this.props.value);
-    }
   }
 
   componentWillUnmount() {

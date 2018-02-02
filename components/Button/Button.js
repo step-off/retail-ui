@@ -2,8 +2,6 @@
 import events from 'add-event-listener';
 import classNames from 'classnames';
 import * as React from 'react';
-import styled from '../internal/styledRender';
-import Upgrades from '../../lib/Upgrades';
 
 import PropTypes from 'prop-types';
 
@@ -11,18 +9,7 @@ import Corners from './Corners';
 import Icon from '../Icon';
 
 import '../ensureOldIEClassName';
-
-const isFlatDisign = Upgrades.ifFlatDisignEnabled();
-
-let cssStyles;
-let jssStyles;
-if (process.env.EXPERIMENTAL_CSS_IN_JS) {
-  jssStyles = require('./Button.styles').default;
-} else {
-  cssStyles = isFlatDisign
-    ? require('./Button.flat.less')
-    : require('./Button.less');
-}
+import styles from './Button.less';
 
 const KEYCODE_TAB = 9;
 
@@ -38,45 +25,43 @@ function listenTabPresses() {
   }
 }
 
+const SIZE_CLASSES = {
+  small: styles.sizeSmall,
+  medium: styles.sizeMedium,
+  large: styles.sizeLarge
+};
+
 type Props = {
-  /** @ignore */
   _noPadding?: boolean,
-
-  /** @ignore */
   _noRightPadding?: boolean,
-
   active?: boolean,
   arrow?: boolean,
   autoFocus?: boolean,
   checked?: boolean,
-  children?: React.Node,
-  /** @ignore */
-  corners?: number,
+  children?: string,
+  corners?: number, // internal
   disabled?: boolean,
-  /** @ignore */
-  disableFocus?: boolean,
   focused?: boolean,
   icon?: string,
   loading?: boolean,
   narrow?: boolean,
-  onClick?: (e: SyntheticMouseEvent<HTMLButtonElement>) => void,
-  onKeyDown?: (e: SyntheticKeyboardEvent<HTMLButtonElement>) => void,
-  onMouseEnter?: (e: SyntheticMouseEvent<HTMLButtonElement>) => void,
-  onMouseLeave?: (e: SyntheticMouseEvent<HTMLButtonElement>) => void,
-  onMouseOver?: (e: SyntheticMouseEvent<HTMLButtonElement>) => void,
+  onClick?: (e: SyntheticMouseEvent<>) => void,
+  onKeyDown?: (e: SyntheticKeyboardEvent<>) => void,
+  onMouseEnter?: (e: SyntheticMouseEvent<>) => void,
+  onMouseLeave?: (e: SyntheticMouseEvent<>) => void,
+  onMouseOver?: (e: SyntheticMouseEvent<>) => void,
   size: 'small' | 'medium' | 'large',
   type: 'button' | 'submit' | 'reset',
   use: 'default' | 'primary' | 'success' | 'danger' | 'pay' | 'link',
-  /** @ignore */
-  visuallyFocused?: boolean,
   width?: number | string
 };
 
-type State = {
-  focusedByTab: boolean
-};
-
-class Button extends React.Component<Props, State> {
+class Button extends React.Component<
+  Props,
+  {
+    focusedByTab: boolean
+  }
+> {
   static TOP_LEFT = Corners.TOP_LEFT;
   static TOP_RIGHT = Corners.TOP_RIGHT;
   static BOTTOM_RIGHT = Corners.BOTTOM_RIGHT;
@@ -99,8 +84,6 @@ class Button extends React.Component<Props, State> {
     autoFocus: PropTypes.bool,
 
     checked: PropTypes.bool,
-
-    disableFocus: PropTypes.bool,
 
     disabled: PropTypes.bool,
 
@@ -129,8 +112,6 @@ class Button extends React.Component<Props, State> {
       'link'
     ]),
 
-    visuallyFocused: PropTypes.bool,
-
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 
     /**
@@ -151,7 +132,9 @@ class Button extends React.Component<Props, State> {
     type: 'button'
   };
 
-  state = {
+  state: {
+    focusedByTab: boolean
+  } = {
     focusedByTab: false
   };
 
@@ -167,7 +150,7 @@ class Button extends React.Component<Props, State> {
   }
 
   /**
-   * @public
+   * @api
    */
   focus() {
     if (this._node) {
@@ -176,7 +159,7 @@ class Button extends React.Component<Props, State> {
   }
 
   /**
-   * @public
+   * @api
    */
   blur() {
     if (this._node) {
@@ -185,7 +168,7 @@ class Button extends React.Component<Props, State> {
   }
 
   handleFocus = (e: SyntheticFocusEvent<>) => {
-    if (!this.props.disabled && !this.props.disableFocus) {
+    if (!this.props.disabled) {
       // focus event fires before keyDown eventlistener
       // so we should check tabPressed in async way
       process.nextTick(() => {
@@ -201,15 +184,9 @@ class Button extends React.Component<Props, State> {
     this.setState({ focusedByTab: false });
   };
 
-  render = styled(cssStyles, jssStyles, classes => {
+  render() {
     const { corners = 0 } = this.props;
     const radius = '2px';
-
-    const SIZE_CLASSES = {
-      small: classes.sizeSmall,
-      medium: classes.sizeMedium,
-      large: classes.sizeLarge
-    };
 
     const rootProps = {
       // By default the type attribute is 'submit'. IE8 will fire a click event
@@ -217,18 +194,18 @@ class Button extends React.Component<Props, State> {
       // input is focused. So we set type to 'button' by default.
       type: this.props.type,
       className: classNames({
-        [classes.root]: true,
-        [classes[this.props.use]]: true,
-        [classes.active]: this.props.active,
-        [classes.checked]: this.props.checked,
-        [classes.disabled]: this.props.disabled || this.props.loading,
-        [classes.narrow]: this.props.narrow,
-        [classes.noPadding]: this.props._noPadding,
-        [classes.noRightPadding]: this.props._noRightPadding,
-        [classes.buttonWithIcon]: !!this.props.icon,
-        [classes.arrowButton]: this.props.arrow,
+        [styles.root]: true,
+        [styles['use-' + this.props.use]]: true,
+        [styles.active]: this.props.active,
+        [styles.checked]: this.props.checked,
+        [styles.disabled]: this.props.disabled || this.props.loading,
+        [styles.narrow]: this.props.narrow,
+        [styles.noPadding]: this.props._noPadding,
+        [styles.noRightPadding]: this.props._noRightPadding,
+        [styles.buttonWithIcon]: !!this.props.icon,
+        [styles.arrowButton]: this.props.arrow,
         [SIZE_CLASSES[this.props.size]]: true,
-        [classes.focus]: this.state.focusedByTab || this.props.visuallyFocused
+        [styles.focus]: this.state.focusedByTab
       }),
       style: {
         borderRadius:
@@ -245,15 +222,14 @@ class Button extends React.Component<Props, State> {
       onKeyDown: this.props.onKeyDown,
       onMouseEnter: this.props.onMouseEnter,
       onMouseLeave: this.props.onMouseLeave,
-      onMouseOver: this.props.onMouseOver,
-      tabIndex: this.props.disableFocus ? '-1' : '0'
+      onMouseOver: this.props.onMouseOver
     };
     if (this.props.align) {
       rootProps.style.textAlign = this.props.align;
     }
 
     const wrapProps = {
-      className: this.props.arrow ? classes.wrap_arrow : classes.wrap,
+      className: this.props.arrow ? styles.wrap_arrow : styles.wrap,
       style: {
         width: undefined
       }
@@ -264,20 +240,20 @@ class Button extends React.Component<Props, State> {
 
     let error = null;
     if (this.props.error) {
-      error = <div className={classes.error} />;
+      error = <div className={styles.error} />;
     } else if (this.props.warning) {
-      error = <div className={classes.warning} />;
+      error = <div className={styles.warning} />;
     }
 
     let loading = null;
     if (this.props.loading) {
-      loading = <div className={classes.loading} />;
+      loading = <div className={styles.loading} />;
     }
 
     let icon = null;
     if (this.props.icon) {
       icon = (
-        <span className={classes.icon}>
+        <span className={styles.icon}>
           <Icon name={this.props.icon} />
         </span>
       );
@@ -288,10 +264,10 @@ class Button extends React.Component<Props, State> {
       arrow = (
         <div
           className={classNames(
-            classes.arrow,
-            this.props.loading ? classes.arrow_loading : '',
-            this.props.error ? classes.arrow_error : '',
-            this.props.warning ? classes.arrow_warning : ''
+            styles.arrow,
+            this.props.loading ? styles.arrow_loading : '',
+            this.props.error ? styles.arrow_error : '',
+            this.props.warning ? styles.arrow_warning : ''
           )}
         />
       );
@@ -300,13 +276,13 @@ class Button extends React.Component<Props, State> {
     // Force disable all props and features, that cannot be use with Link
     if (this.props.use === 'link') {
       rootProps.className = classNames({
-        [classes.root]: true,
-        [classes.link]: true,
-        [classes.disabled]: this.props.disabled,
-        [classes.buttonWithIcon]: !!this.props.icon
+        [styles.root]: true,
+        [styles['use-link']]: true,
+        [styles.disabled]: this.props.disabled,
+        [styles.buttonWithIcon]: !!this.props.icon
       });
       Object.assign(wrapProps, {
-        className: classes.wrap,
+        className: styles.wrap,
         style: { width: wrapProps.style.width }
       });
       rootProps.style.textAlign = null;
@@ -320,7 +296,7 @@ class Button extends React.Component<Props, State> {
         <button ref={this._ref} {...rootProps}>
           {loading}
           {arrow}
-          <div className={classes.caption}>
+          <div className={styles.caption}>
             {icon}
             {this.props.children}
           </div>
@@ -328,7 +304,7 @@ class Button extends React.Component<Props, State> {
         </button>
       </span>
     );
-  });
+  }
 
   _ref = node => {
     this._node = node;

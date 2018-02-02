@@ -1,29 +1,16 @@
 // @flow
 
 import classNames from 'classnames';
-import MaskedInput from 'react-input-mask/dist/react-input-mask';
+import MaskedInput from 'react-input-mask';
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import invariant from 'invariant';
-import styled from '../internal/styledRender';
 
 import filterProps from '../filterProps';
 import polyfillPlaceholder from '../polyfillPlaceholder';
 import '../ensureOldIEClassName';
-import Upgrades from '../../lib/Upgrades';
-
-const isFlatDisign = Upgrades.ifFlatDisignEnabled();
-
-let cssStyles;
-let jssStyles;
-if (process.env.EXPERIMENTAL_CSS_IN_JS) {
-  jssStyles = require('./Input.styles').default;
-} else {
-  cssStyles = isFlatDisign
-    ? require('./Input.flat.less')
-    : require('./Input.less');
-}
+import styles from './Input.less';
 
 const INPUT_PASS_PROPS = {
   autoFocus: true,
@@ -35,9 +22,6 @@ const INPUT_PASS_PROPS = {
 
   onBlur: true,
   onCopy: true,
-  onClick: true,
-  onMouseUp: true,
-  onMouseDown: true,
   onCut: true,
   onFocus: true,
   onInput: true,
@@ -47,12 +31,16 @@ const INPUT_PASS_PROPS = {
   onPaste: true
 };
 
+const SIZE_CLASS_NAMES = {
+  small: styles.sizeSmall,
+  medium: styles.sizeMedium,
+  large: styles.sizeLarge
+};
+
 export type Props = {
   align?: 'left' | 'center' | 'right',
   alwaysShowMask?: boolean,
-  autoFocus?: boolean,
   borderless?: boolean,
-  /** @ignore */
   className?: string, // TODO: kill it
   disabled?: boolean,
   error?: boolean,
@@ -70,9 +58,6 @@ export type Props = {
   warning?: boolean,
   width?: number | string,
   onBlur?: (e: Event) => void,
-  onClick?: (e: SyntheticMouseEvent<HTMLInputElement>) => void,
-  onMouseUp?: (e: SyntheticMouseEvent<HTMLInputElement>) => void,
-  onMouseDown?: (e: SyntheticMouseEvent<HTMLInputElement>) => void,
   onChange?: (e: SyntheticInputEvent<HTMLInputElement>, v: string) => void,
   onCopy?: (e: SyntheticClipboardEvent<>) => void,
   onCut?: (e: SyntheticClipboardEvent<>) => void,
@@ -81,7 +66,7 @@ export type Props = {
   onKeyDown?: (e: SyntheticKeyboardEvent<>) => void,
   onKeyPress?: (e: SyntheticKeyboardEvent<>) => void,
   onKeyUp?: (e: SyntheticKeyboardEvent<>) => void,
-  onPaste?: (e: SyntheticClipboardEvent<HTMLInputElement>) => void,
+  onPaste?: (e: SyntheticFocusEvent<>) => void,
   onMouseEnter?: (e: SyntheticMouseEvent<>) => void,
   onMouseLeave?: (e: SyntheticMouseEvent<>) => void,
   onMouseOver?: (e: SyntheticMouseEvent<>) => void
@@ -91,7 +76,7 @@ type State = {
   polyfillPlaceholder: boolean
 };
 
-class Input extends React.Component<Props, State> {
+export default class Input extends React.Component<Props, State> {
   static propTypes = {
     align: PropTypes.oneOf(['left', 'center', 'right']),
 
@@ -199,35 +184,25 @@ class Input extends React.Component<Props, State> {
     size: 'small'
   };
 
-  constructor(props: Props) {
-    super(props);
-  }
-
   state: State = {
     polyfillPlaceholder: false
   };
 
   input: ?HTMLInputElement = null;
 
-  render = styled(cssStyles, jssStyles, classes => {
-    const SIZE_CLASS_NAMES = {
-      small: classes.sizeSmall,
-      medium: classes.sizeMedium,
-      large: classes.sizeLarge
-    };
-
+  render() {
     const className: string = this.props.className || '';
     const sizeClassName =
       SIZE_CLASS_NAMES[this.props.size || Input.defaultProps.size];
     var labelProps = {
       className: classNames({
-        [classes.root]: true,
+        [styles.root]: true,
         [className]: true,
-        [classes.disabled]: this.props.disabled,
-        [classes.error]: this.props.error,
-        [classes.warning]: this.props.warning,
-        [classes.padLeft]: this.props.leftIcon,
-        [classes.padRight]: this.props.rightIcon,
+        [styles.disabled]: this.props.disabled,
+        [styles.error]: this.props.error,
+        [styles.warning]: this.props.warning,
+        [styles.padLeft]: this.props.leftIcon,
+        [styles.padRight]: this.props.rightIcon,
         [sizeClassName]: true
       }),
       style: {},
@@ -249,7 +224,7 @@ class Input extends React.Component<Props, State> {
     ) {
       placeholder = (
         <div
-          className={classes.placeholder}
+          className={styles.placeholder}
           style={{ textAlign: this.props.align || 'inherit' }}
         >
           {this.props.placeholder}
@@ -259,23 +234,29 @@ class Input extends React.Component<Props, State> {
 
     var leftIcon = null;
     if (this.props.leftIcon) {
-      leftIcon = <div className={classes.leftIcon}>{this.props.leftIcon}</div>;
+      leftIcon = (
+        <div className={styles.leftIcon}>
+          {this.props.leftIcon}
+        </div>
+      );
     }
     var rightIcon = null;
     if (this.props.rightIcon) {
       rightIcon = (
-        <div className={classes.rightIcon}>{this.props.rightIcon}</div>
+        <div className={styles.rightIcon}>
+          {this.props.rightIcon}
+        </div>
       );
     }
 
     const inputProps = {
       ...filterProps(this.props, INPUT_PASS_PROPS),
       className: classNames({
-        [classes.input]: true,
-        [classes.borderless]: this.props.borderless
+        [styles.input]: true,
+        [styles.borderless]: this.props.borderless
       }),
       value: this.props.value,
-      onChange: this._handleChange,
+      onChange: e => this._handleChange(e),
       style: {},
       ref: this.getInputFromRef
     };
@@ -290,7 +271,6 @@ class Input extends React.Component<Props, State> {
     }
 
     let input = null;
-
     if (this.props.mask) {
       input = (
         <MaskedInput
@@ -314,7 +294,7 @@ class Input extends React.Component<Props, State> {
         {rightIcon}
       </label>
     );
-  });
+  }
 
   componentDidMount() {
     if (polyfillPlaceholder) {
@@ -336,7 +316,7 @@ class Input extends React.Component<Props, State> {
   };
 
   /**
-   * @public
+   * @api
    */
   focus() {
     invariant(this.input, 'Cannot call "focus" because Input is not mounted');
@@ -344,7 +324,7 @@ class Input extends React.Component<Props, State> {
   }
 
   /**
-   * @public
+   * @api
    */
   blur() {
     invariant(this.input, 'Cannot call "blur" because Input is not mounted');
@@ -352,7 +332,7 @@ class Input extends React.Component<Props, State> {
   }
 
   /**
-   * @public
+   * @api
    */
   setSelectionRange(start: number, end: number) {
     invariant(
@@ -372,7 +352,7 @@ class Input extends React.Component<Props, State> {
     }
   }
 
-  _handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  _handleChange(event) {
     if (polyfillPlaceholder) {
       const fieldIsEmpty = event.target.value === '';
       if (this.state.polyfillPlaceholder !== fieldIsEmpty) {
@@ -383,7 +363,5 @@ class Input extends React.Component<Props, State> {
     if (this.props.onChange) {
       this.props.onChange(event, event.target.value);
     }
-  };
+  }
 }
-
-export default Input;

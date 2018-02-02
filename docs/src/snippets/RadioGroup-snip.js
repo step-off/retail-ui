@@ -1,43 +1,30 @@
-var items = ['One', 'Two', 'Three', 'Four'];
+var items = ['One', 'Two', 'Three'];
 
-var simpleRadioGroup = (
-  <div>
-    <h2>Numbers</h2>
-    <RadioGroup name="number-simple" items={items} defaultValue="One" />
-  </div>
-);
+class Component extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: ''
+    };
+  }
 
-var complexRadioGroup = (
-  <div>
-    <h2>Numbers</h2>
-    <RadioGroup name="number-complex" defaultValue="3">
-      <Gapped gap={40}>
-        <Gapped vertical gap={10}>
-          <b>Odd</b>
-          <Radio value="1">One</Radio>
-          <Radio value="3">Three</Radio>
-          <Radio value="5" disabled>
-            Five
-          </Radio>
-          <Radio value="7">Seven</Radio>
-        </Gapped>
-        <Gapped vertical gap={10}>
-          <b>Even</b>
-          <Radio value="2">Two</Radio>
-          <Radio value="4">Four</Radio>
-          <Radio value="6">Six</Radio>
-          <Radio value="8">Eight</Radio>
-        </Gapped>
-      </Gapped>
-    </RadioGroup>
-  </div>
-);
+  handleChange(el) {
+    this.setState({ value: el.target.value });
+  }
 
-var snip = (
-  <div>
-    {simpleRadioGroup}
-    {complexRadioGroup}
-  </div>
-);
+  render() {
+    return (
+      <div>
+        <div>
+          <RadioGroup
+            items={items}
+            value={this.state.value}
+            onChange={(el) => this.handleChange(el)}
+          />
+        </div>
+      </div>
+    );
+  }
+}
 
-ReactDOM.render(snip, mountNode);
+ReactDOM.render(<Component />, mountNode);

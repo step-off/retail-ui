@@ -51,7 +51,7 @@ type State = {
  * в реактовском контексте задать `insideFixedContainer: true`, то у тултипа
  * будет `fixed`-позиционирование, и он не будет дергаться. Пример:
  *
- * ```js
+ * ```
  * class Container extends React.Component {
  *   static childContextTypes = {
  *     insideFixedContainer: React.PropTypes.bool,
@@ -147,12 +147,10 @@ export default class Tooltip extends React.Component<Props, State> {
       childProps.onBlur = this._handleBlur;
     }
 
-    let child: any = this.props.children;
+    let child = this.props.children;
     this._lastOnFocus = null;
     this._lastOnBlur = null;
-
-    const isStatefulChild = React.Component.isPrototypeOf(child.type);
-    if (typeof child === 'string' || !isStatefulChild) {
+    if (typeof child === 'string') {
       child = (
         <span ref={this._getHotspotRef(null)} {...childProps}>
           {child}
@@ -172,7 +170,6 @@ export default class Tooltip extends React.Component<Props, State> {
       <RenderLayer
         onClickOutside={this._handleBoxClose}
         onFocusOutside={this._handleBoxClose}
-        active={this.state.opened}
       >
         <span {...props} className={className}>
           {child}

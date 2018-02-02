@@ -9,7 +9,7 @@ class MockDateComponent extends React.Component<{ date: Date }> {
   }
 
   componentWillUnmount() {
-    MockDate.reset();
+    MockDate.clear();
   }
 
   render() {

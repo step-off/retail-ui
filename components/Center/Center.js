@@ -9,9 +9,7 @@ type Props = {
   align?: 'left' | 'center' | 'right',
   // eslint-disable-next-line flowtype/no-weak-types
   style?: Object,
-  children?: React.Node,
-  // eslint-disable-next-line flowtype/no-weak-types
-  [key: string]: any
+  children?: React.Node
 };
 
 /**
@@ -31,14 +29,21 @@ export default class Center extends React.Component<Props> {
   };
 
   render() {
-    const { align, style, children, ...rest } = this.props;
+    const { align, ...rest } = this.props;
 
-    const styleJoined = Object.assign({ textAlign: align }, style);
+    const style = Object.assign(
+      {
+        textAlign: align
+      },
+      this.props.style
+    );
 
     return (
-      <div className={styles.root} {...rest} style={styleJoined}>
+      <div className={styles.root} {...rest} style={style}>
         <span className={styles.spring} />
-        <span className={styles.container}>{children}</span>
+        <span className={styles.container}>
+          {this.props.children}
+        </span>
       </div>
     );
   }

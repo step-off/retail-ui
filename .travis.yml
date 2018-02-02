@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- '8'
+- '6'
 cache: yarn
 sudo: required
 dist: trusty
@@ -11,6 +11,9 @@ addons:
     packages:
     - g++-4.8
     - graphicsmagick
+before_script:
+- yarn storybook &
+- sleep 2
 before_deploy:
 - yarn
 - yarn build
@@ -23,7 +26,10 @@ before_deploy:
 - ssh-add travis-deploy-key
 - git config --global user.name "Travis CI"
 - git config --global user.email "retail-ui-publish-bot@skbkontur.ru"
-- yarn deploy
+- cd docs
+- yarn
+- ./deploy.sh
+- cd ..
 deploy:
 - provider: npm
   email: tihonov.ea@gmail.com

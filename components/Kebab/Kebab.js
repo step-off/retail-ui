@@ -8,7 +8,6 @@ import Icon20 from '../Icon/20px';
 import Icon from '../Icon';
 import Popup from '../Popup';
 import Menu from '../Menu/Menu.js';
-import LayoutEvents from '../../lib/LayoutEvents';
 import RenderLayer from '../RenderLayer';
 
 import styles from './Kebab.less';
@@ -20,8 +19,7 @@ type Props = {
   disabled?: boolean,
   onClose: () => void,
   onOpen: () => void,
-  size: 'small' | 'large',
-  menuMaxHeight?: number | string
+  size: 'small' | 'large'
 };
 
 type State = {
@@ -44,15 +42,9 @@ export default class Kebab extends React.Component<Props, State> {
   };
 
   _anchor: ?HTMLElement;
-  _listener;
 
   componentDidMount() {
-    this._listener = LayoutEvents.addListener(this._handleCloseRequest);
     listenTabPresses();
-  }
-
-  componentWillUnmount() {
-    this._listener.remove();
   }
 
   render() {
@@ -60,9 +52,8 @@ export default class Kebab extends React.Component<Props, State> {
     const { focusedByTab, opened } = this.state;
     return (
       <RenderLayer
-        onClickOutside={this._handleCloseRequest}
-        onFocusOutside={this._handleCloseRequest}
-        active={this.state.opened}
+        onClickOutside={this._handleClickOutside}
+        onFocusOutside={this._handleClickOutside}
       >
         <div className={styles.container}>
           <div
@@ -81,7 +72,7 @@ export default class Kebab extends React.Component<Props, State> {
           >
             {this._renderIcon(this.props.size)}
           </div>
-          {this._anchor && (
+          {this._anchor &&
             <Popup
               anchorElement={this._anchor}
               positions={[
@@ -98,16 +89,11 @@ export default class Kebab extends React.Component<Props, State> {
               pinOffset={15}
             >
               <div className={styles.menu}>
-                <Menu
-                  hasShadow={false}
-                  onItemClick={this._handleMenuItemClick}
-                  maxHeight={this.props.menuMaxHeight || 'none'}
-                >
+                <Menu hasShadow={false} onItemClick={this._handleMenuItemClick}>
                   {this.props.children}
                 </Menu>
               </div>
-            </Popup>
-          )}
+            </Popup>}
         </div>
       </RenderLayer>
     );
@@ -153,7 +139,7 @@ export default class Kebab extends React.Component<Props, State> {
     }
   }
 
-  _handleCloseRequest = () => {
+  _handleClickOutside = () => {
     this._setPopupState(false);
   };
 
@@ -196,10 +182,6 @@ export default class Kebab extends React.Component<Props, State> {
 Kebab.propTypes = {
   children: PropTypes.node,
   disabled: PropTypes.bool,
-  menuMaxHeight: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number
-  ]),
 
   /**
    * Размер кебаба small 14px | large 20px

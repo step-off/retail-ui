@@ -2,7 +2,7 @@ import * as React from 'react';
 
 export interface ItemComponentProps {
   active: boolean;
-  children?: React.ReactNode;
+  children?: React.ReactElement<any>;
   className: string;
   onClick: boolean | (() => void);
   pageNumber: number | 'forward';
@@ -10,8 +10,8 @@ export interface ItemComponentProps {
 }
 
 export type ItemComponent =
-  | React.ComponentType<ItemComponentProps>
-  | ((props: ItemComponentProps) => React.ReactNode)
+  | React.Component<ItemComponentProps, any>
+  | ((props: ItemComponentProps) => React.ReactElement<any>)
   | string;
 
 export interface PagingProps {
@@ -28,6 +28,4 @@ export interface PagingState {
   focusedItem: ItemType;
 }
 
-export default class Paging extends React.Component<PagingProps, PagingState> {
-  static isForward(pageNumber: number | 'forward'): boolean;
-}
+export default class Paging extends React.Component<PagingProps, PagingState> {}

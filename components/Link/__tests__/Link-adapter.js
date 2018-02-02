@@ -6,8 +6,7 @@ import * as React from 'react';
 
 import Link from '../Link.adapter';
 
-// Not supporting React 16
-xdescribe('Link-adapter', () => {
+describe('Link-adapter', () => {
   testAdapter('click', mount => {
     const onClick = jest.fn();
     const adapter = mount(<Link onClick={onClick} />);

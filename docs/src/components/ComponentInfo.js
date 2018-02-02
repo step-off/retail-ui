@@ -2,6 +2,7 @@ import React from 'react';
 
 import CodeMirror from 'react-codemirror';
 import 'codemirror/lib/codemirror.css';
+// import 'codemirror/theme/panda-syntax.css';
 import 'codemirror/mode/jsx/jsx';
 
 import components from '../components';
@@ -13,6 +14,7 @@ import styles from './ComponentInfo.less';
 import Link from '../../../components/Link';
 
 const editorOptions = {
+  // theme: 'panda-syntax',
   lineWrapping: true,
   lineNumbers: true,
   mode: 'jsx',
@@ -48,13 +50,12 @@ var Component = React.createClass({
             </Link>
           </div>
           <div className={styles.code}>
-            {this.state.showCode && (
+            {this.state.showCode &&
               <CodeMirror
                 value={this.state.src}
                 onChange={this.handleCodeChange}
                 options={editorOptions}
-              />
-            )}
+              />}
           </div>
         </div>
 

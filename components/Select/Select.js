@@ -39,36 +39,32 @@ const PASS_BUTTON_PROPS = {
   onMouseOver: true
 };
 
-type Props<TValue, TItem> = {
-  /** @ignore */
+type Props<V, I> = {
   _icon?: string,
-  /** @ignore */
   _renderButton?: (params: ButtonParams) => React.Node,
-  defaultValue?: TValue,
-  /** @ignore */
+  defaultValue?: V,
   diadocLinkIcon?: string,
   disablePortal?: boolean,
   disabled?: boolean,
   error?: boolean,
-  filterItem: (value: TValue, item: TItem, pattern: string) => boolean,
-  items?: TItem[],
+  filterItem: (value: V, item: I, pattern: string) => boolean,
+  items?: I[],
   maxMenuHeight?: number,
   maxWidth?: number | string,
   menuAlign?: 'left' | 'right',
   menuWidth?: number | string,
-  onChange?: (e: { target: { value: TValue } }, value: TValue) => void,
+  onChange?: (e: { target: { value: V } }, value: V) => void,
   onClose?: () => void,
   onMouseEnter?: (e: SyntheticMouseEvent<>) => void,
   onMouseLeave?: (e: SyntheticMouseEvent<>) => void,
   onMouseOver?: (e: SyntheticMouseEvent<>) => void,
   onOpen?: () => void,
-  onClose?: () => void,
   placeholder?: React.Node,
-  renderItem: (value: TValue, item: TItem) => React.Node,
-  renderValue: (value: TValue, item: TItem) => React.Node,
-  areValuesEqual: (value1: TValue, value2: TValue) => boolean,
+  renderItem: (value: V, item: I) => React.Node,
+  renderValue: (value: V, item: I) => React.Node,
+  areValuesEqual: (value1: V, value2: V) => boolean,
   search?: boolean,
-  value?: ?TValue,
+  value?: ?V,
   width?: number | string
 };
 
@@ -78,14 +74,11 @@ type State = {
   value: mixed
 };
 
-class Select<TValue, TItem> extends React.Component<
-  Props<TValue, TItem>,
-  State
-> {
+class Select<V, I> extends React.Component<Props<V, I>, State> {
   static propTypes = {
     /**
-     * Функция для сравнения `value` с элементом из `items`
-     */
+    * Функция для сравнения `value` с элементом из `items`
+    */
     areValuesEqual: PropTypes.func,
 
     defaultValue: PropTypes.any,
@@ -179,7 +172,7 @@ class Select<TValue, TItem> extends React.Component<
 
   _menu: ?Menu;
 
-  constructor(props: Props<TValue, TItem>, context: mixed) {
+  constructor(props: Props<V, I>, context: mixed) {
     super(props, (context: mixed));
 
     this.state = {
@@ -189,7 +182,23 @@ class Select<TValue, TItem> extends React.Component<
   }
 
   render() {
-    const label = this.renderLabel();
+    var value = this._getValue();
+
+    var label;
+    if (value != null) {
+      label = this.props.renderValue(
+        // $FlowIssue
+        value,
+        // $FlowIssue
+        this._getItemByValue(this.props.items, value)
+      );
+    } else {
+      label = (
+        <span className={styles.placeholder}>
+          {this.props.placeholder}
+        </span>
+      );
+    }
 
     const buttonParams: ButtonParams = {
       opened: this.state.opened,
@@ -200,8 +209,11 @@ class Select<TValue, TItem> extends React.Component<
 
     const style = {
       width: this.props.width,
-      maxWidth: this.props.maxWidth || undefined
+      maxWidth: undefined
     };
+    if (this.props.maxWidth) {
+      style.maxWidth = this.props.maxWidth;
+    }
 
     return (
       <RenderLayer
@@ -219,19 +231,6 @@ class Select<TValue, TItem> extends React.Component<
     );
   }
 
-  renderLabel() {
-    const value = this._getValue();
-    // $FlowIssue
-    const item = this._getItemByValue(value);
-
-    if (item != null || value != null) {
-      // $FlowIssue
-      return this.props.renderValue(value, item);
-    }
-
-    return <span className={styles.placeholder}>{this.props.placeholder}</span>;
-  }
-
   renderDefaultButton(params: ButtonParams) {
     if (this.props.diadocLink) {
       return this.renderLinkButton(params);
@@ -245,9 +244,11 @@ class Select<TValue, TItem> extends React.Component<
       _noPadding: true,
       width: '100%',
       onClick: params.onClick,
-      onKeyDown: params.onKeyDown,
-      active: params.opened
+      onKeyDown: params.onKeyDown
     };
+    if (params.opened) {
+      buttonProps.active = true;
+    }
 
     if (this.props._icon) {
       Object.assign(buttonProps, {
@@ -257,10 +258,11 @@ class Select<TValue, TItem> extends React.Component<
       });
     }
 
-    const labelProps = {
+    var labelProps = {
       className: classNames({
         [styles.label]: true,
-        [styles.labelWithLeftIcon]: !!this.props._icon
+        [styles.labelWithLeftIcon]: !!this.props._icon,
+        [styles.labelIsOpened]: params.opened
       }),
       style: {
         paddingRight: buttonProps.size === 'large' ? '41px' : '38px'
@@ -270,7 +272,9 @@ class Select<TValue, TItem> extends React.Component<
     return (
       <Button {...buttonProps}>
         <span {...labelProps}>
-          <span className={styles.labelText}>{params.label}</span>
+          <span className={styles.labelText}>
+            {params.label}
+          </span>
           <div className={styles.arrowWrap}>
             <div className={styles.arrow} />
           </div>
@@ -290,17 +294,24 @@ class Select<TValue, TItem> extends React.Component<
       onKeyDown: params.onKeyDown
     };
 
-    return <Link {...linkProps}>{params.label}</Link>;
+    return (
+      <Link {...linkProps}>
+        {params.label}
+      </Link>
+    );
   }
 
   renderMenu() {
-    const search = this.props.search ? (
-      <div className={styles.search}>
-        <Input ref={this._focusInput} onChange={this.handleSearch} />
-      </div>
-    ) : null;
+    var search = null;
+    if (this.props.search) {
+      search = (
+        <div className={styles.search}>
+          <Input ref={this._focusInput} onChange={this.handleSearch} />
+        </div>
+      );
+    }
 
-    const value = this._getValue();
+    var value = this._getValue();
 
     return (
       <DropdownContainer
@@ -320,8 +331,8 @@ class Select<TValue, TItem> extends React.Component<
           {search}
           {this._mapItems(
             (
-              iValue: TValue,
-              item: TItem | (() => React.Node),
+              iValue: V,
+              item: I | (() => React.Node),
               i: number,
               comment: ?React.Node
             ) => {
@@ -353,7 +364,7 @@ class Select<TValue, TItem> extends React.Component<
     );
   }
 
-  static static = (element: mixed) => {
+  static static = element => {
     invariant(
       React.isValidElement(element) || typeof element === 'function',
       'Select.static(element) expects element to be a valid react element.'
@@ -380,17 +391,35 @@ class Select<TValue, TItem> extends React.Component<
   };
 
   /**
-   * @public
+   * @api
    */
   open() {
     this._open();
   }
 
   /**
-   * @public
+   * @api
    */
   close() {
     this._close();
+  }
+
+  _handleNativeDocClick = event => {
+    const target = event.target || event.srcElement;
+    const nodes = this._getDomNodes();
+    if (nodes.some(node => node && node.contains(target))) {
+      return;
+    }
+    this._close();
+  };
+
+  _getDomNodes() {
+    const result = [];
+    result.push(ReactDOM.findDOMNode(this));
+    if (this._menu) {
+      result.push(ReactDOM.findDOMNode(this._menu));
+    }
+    return result;
   }
 
   _toggle = () => {
@@ -413,16 +442,13 @@ class Select<TValue, TItem> extends React.Component<
   _close = () => {
     if (this.state.opened) {
       this.setState({ opened: false });
-
-      const { onClose } = this.props;
-      onClose && onClose();
     }
 
     events.removeEventListener(window, 'popstate', this._close);
   };
 
   handleKey = (e: SyntheticKeyboardEvent<>) => {
-    const key = e.key;
+    var key = e.key;
     if (!this.state.opened) {
       if (key === ' ' || key === 'ArrowUp' || key === 'ArrowDown') {
         e.preventDefault();
@@ -456,7 +482,7 @@ class Select<TValue, TItem> extends React.Component<
     }
   };
 
-  _select(value: TValue) {
+  _select(value: V) {
     this.setState(
       {
         opened: false,
@@ -486,24 +512,25 @@ class Select<TValue, TItem> extends React.Component<
     const pattern =
       this.state.searchPattern && this.state.searchPattern.toLowerCase();
 
-    const result = [];
+    const ret = [];
     let index = 0;
     for (const entry of items) {
       const [value, item, comment] = normalizeEntry(entry);
       // $FlowIssue
       if (!pattern || this.props.filterItem(value, item, pattern)) {
         // $FlowIssue
-        result.push(fn(value, item, index, comment));
+        ret.push(fn(value, item, index, comment));
         ++index;
       }
     }
 
-    return result;
+    return ret;
   }
 
-  _getItemByValue(value: TValue) {
-    const items = this.props.items || [];
-
+  _getItemByValue(items: ?(I[]), value: V) {
+    if (!items) {
+      return null;
+    }
     for (let entry of items) {
       const [itemValue, item] = normalizeEntry(entry);
       // $FlowIssue
@@ -515,15 +542,15 @@ class Select<TValue, TItem> extends React.Component<
   }
 }
 
-function renderValue(value: *, item: *) {
+function renderValue(value, item) {
   return item;
 }
 
-function renderItem(value: *, item: *) {
+function renderItem(value, item) {
   return item;
 }
 
-function areValuesEqual(value1: *, value2: *) {
+function areValuesEqual(value1, value2) {
   return value1 === value2;
 }
 
@@ -535,8 +562,7 @@ function normalizeEntry(entry) {
   }
 }
 
-function filterItem(value: *, item: *, pattern: string) {
-  // $FlowIssue
+function filterItem(value, item, pattern) {
   return item.toLowerCase().indexOf(pattern) !== -1;
 }
 

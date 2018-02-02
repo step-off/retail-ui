@@ -6,8 +6,7 @@ import { mountTest } from '../TestingTestUtils';
 
 import RenderContainer from '../../components/RenderContainer';
 
-// Not supporting React 16
-xdescribe('ReactTesting', () => {
+describe('ReactTesting', () => {
   it('follows through RenderContainer', () => {
     const wrapper = mount(
       <div>
@@ -28,7 +27,9 @@ xdescribe('ReactTesting', () => {
 
   it('works for <div ref tid> case.', () => {
     const ref = jest.fn();
-    const { node, unmount } = mountTest(<div ref={ref} tid="a" />);
+    const { node, unmount } = mountTest(
+      <div ref={ref} tid="a" />
+    );
 
     expect(node).toBeTruthy();
     expect(node).toBe(ref.mock.calls[0][0]);
@@ -38,7 +39,9 @@ xdescribe('ReactTesting', () => {
 
   it('works for <div tid ref> case.', () => {
     const ref = jest.fn();
-    const { node, unmount } = mountTest(<div tid="a" ref={ref} />);
+    const { node,  unmount } = mountTest(
+      <div tid="a" ref={ref} />
+    );
 
     expect(node).toBeTruthy();
     expect(node).toBe(ref.mock.calls[0][0]);

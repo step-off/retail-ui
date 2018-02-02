@@ -5,15 +5,10 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 
 import filterProps from '../../filterProps';
-
-import '../../ensureOldIEClassName';
 import Upgrades from '../../../lib/Upgrades';
 
-const isFlatDisign = Upgrades.ifFlatDisignEnabled();
-
-const styles = isFlatDisign
-  ? require('./InputLikeText.flat.less')
-  : require('./InputLikeText.less');
+import '../../ensureOldIEClassName';
+import styles from './InputLikeText.less';
 
 const PASS_PROPS = {
   onBlur: true,
@@ -32,13 +27,8 @@ export default class InputLikeText extends React.Component<{
   error?: boolean,
   padRight?: boolean,
   warning?: boolean,
-  disabled?: boolean,
-  size: 'small' | 'medium' | 'large'
+  disabled?: boolean
 }> {
-  static defaultProps = {
-    size: 'small'
-  };
-
   render() {
     const passProps = this.props.disabled
       ? {}
@@ -51,12 +41,14 @@ export default class InputLikeText extends React.Component<{
       [styles.error]: this.props.error,
       [styles.warning]: this.props.warning,
       [styles.disabled]: this.props.disabled,
-      [styles[`size-${this.props.size}`]]: this.props.size
+      [styles.deprecated_oldSize]: !Upgrades.isHeight34Enabled()
     });
 
     return (
       <span tabIndex="0" className={className} {...passProps}>
-        <span className={styles.inner}>{this.props.children}</span>
+        <span className={styles.inner}>
+          {this.props.children}
+        </span>
       </span>
     );
   }

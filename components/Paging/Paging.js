@@ -14,7 +14,7 @@ type ItemComponentProps = {
   active: boolean,
   children?: React.Node,
   className: string,
-  onClick: () => void,
+  onClick: boolean | (() => void),
   pageNumber: number | 'forward',
   tabIndex: number
 };
@@ -35,9 +35,8 @@ type ItemType = number | '.' | 'forward';
 
 export default class Paging extends React.Component<Props, State> {
   static defaultProps = {
-    component: ({ className, onClick, children }: *) => (
+    component: ({ className, onClick, children }) =>
       <span className={className} onClick={onClick} children={children} />
-    )
   };
 
   static isForward(pageNumber: number | 'forward'): boolean /* %checks */ {
@@ -103,7 +102,7 @@ export default class Paging extends React.Component<Props, State> {
         key={'forward'}
         active={false}
         className={classes}
-        onClick={disabled ? noop : this._goForward}
+        onClick={!disabled && this._goForward}
         tabIndex={-1}
         pageNumber={'forward'}
       >
@@ -143,13 +142,18 @@ export default class Paging extends React.Component<Props, State> {
     let canGoForward = this._canGoForward();
 
     return (
-      (canGoBackward || canGoForward) && (
-        <span className={styles.pageLinkHint}>
-          <span className={canGoBackward ? '' : styles.transparent}>{'←'}</span>
-          <span>{NavigationHelper.getKeyName()}</span>
-          <span className={canGoForward ? '' : styles.transparent}>{'→'}</span>
+      (canGoBackward || canGoForward) &&
+      <span className={styles.pageLinkHint}>
+        <span className={canGoBackward ? '' : styles.transparent}>
+          {'←'}
         </span>
-      )
+        <span>
+          {NavigationHelper.getKeyName()}
+        </span>
+        <span className={canGoForward ? '' : styles.transparent}>
+          {'→'}
+        </span>
+      </span>
     );
   };
 
@@ -332,5 +336,3 @@ function listenTabPresses() {
     isListening = true;
   }
 }
-
-function noop() {}

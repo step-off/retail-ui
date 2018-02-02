@@ -67,9 +67,7 @@ class Tabs extends React.Component<Props, State> {
   _tabUpdates = {
     on: (cb: () => void) => {
       const index = this._listeners.push(cb);
-      return () => {
-        this._listeners.splice(index, 1);
-      };
+      return () => this._listeners.splice(index, 1);
     }
   };
 
@@ -126,8 +124,8 @@ class Tabs extends React.Component<Props, State> {
   };
 
   _switchTab = (id: string) => {
-    const { onChange, value } = this.props;
-    if (id !== value && onChange) {
+    const { onChange } = this.props;
+    if (onChange) {
       onChange(this._createEvent(id), id);
     }
   };

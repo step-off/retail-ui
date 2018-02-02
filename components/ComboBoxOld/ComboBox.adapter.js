@@ -11,7 +11,7 @@ const ComboBoxAdapter = {
   },
 
   setValue({ renderer }, value) {
-    renderer._handleInputChange({ target: { value: '' } }, '');
+    renderer._handleInputChange({ target: { value: '' } });
     renderer._change(value);
     renderer._close(true);
   },
@@ -22,10 +22,7 @@ const ComboBoxAdapter = {
 
   search({ renderer }, searchString: string) {
     renderer._handleValueClick();
-    renderer._handleInputChange(
-      { target: { value: searchString } },
-      searchString
-    );
+    renderer._handleInputChange({ target: { value: searchString } });
   },
 
   getResult({ renderer }) {

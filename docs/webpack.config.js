@@ -13,7 +13,7 @@ module.exports = {
     filename: 'docs.js'
   },
   devServer: {
-    disableHostCheck: true
+	disableHostCheck: true
   },
   module: {
     loaders: [
@@ -24,14 +24,13 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
-        loader: require.resolve('babel-loader'),
+        loader: 'babel-loader',
         query: {
-          presets: ['env', 'react'],
-          plugins: [
-            'transform-class-properties',
-            'transform-object-rest-spread'
-          ],
-          cacheDirectory: true
+          presets: [
+            require.resolve('babel-preset-es2015'),
+            require.resolve('babel-preset-stage-0'),
+            require.resolve('babel-preset-react')
+          ]
         },
         include: [
           path.join(__dirname, 'src'),
@@ -55,7 +54,9 @@ module.exports = {
       { test: /\.json/, loader: 'json-loader' }
     ]
   },
-  postcss: [autoprefixer({ browsers: ['last 2 versions', 'IE 8'] })],
+  postcss: [
+    autoprefixer({ browsers: ['last 2 versions', 'IE 8'] })
+  ],
   resolve: {
     fallback: path.join(__dirname, 'node_modules'),
     alias: {
@@ -70,12 +71,6 @@ module.exports = {
   },
   plugins: [
     new ExtractTextPlugin('docs.css'),
-    new webpack.PrefetchPlugin('react'),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: process.env.NODE_ENV,
-        EXPERIMENTAL_CSS_IN_JS: process.env.EXPERIMENTAL_CSS_IN_JS
-      }
-    })
+    new webpack.PrefetchPlugin('react')
   ]
 };

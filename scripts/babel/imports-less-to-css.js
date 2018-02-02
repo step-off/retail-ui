@@ -1,6 +1,3 @@
-const isLess = name => /\.less$/.test(name);
-const lessToCss = name => name.replace(/\.less$/, '.css');
-
 /**
  * Turns this:
  *
@@ -18,28 +15,16 @@ module.exports = function(babel) {
       ImportDeclaration: {
         enter(path) {
           const { source } = path.node;
-          if (!isLess(source.value)) {
+          if (!/\.less$/.test(source.value)) {
             return;
           }
 
           path.replaceWith(
             t.importDeclaration(
               path.node.specifiers,
-              t.stringLiteral(lessToCss(source.value))
+              t.stringLiteral(source.value.replace(/\.less$/, '.css'))
             )
           );
-        }
-      },
-      CallExpression: {
-        enter({ node }) {
-          if (node.callee.name !== 'require') {
-            return;
-          }
-          const firstArg = node.arguments[0];
-          if (!isLess(firstArg.value)) {
-            return;
-          }
-          firstArg.value = lessToCss(firstArg.value);
         }
       }
     }

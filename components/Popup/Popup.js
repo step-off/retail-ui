@@ -1,14 +1,10 @@
 // @flow
-/* eslint-disable flowtype/no-weak-types */
 import cn from 'classnames';
 import * as React from 'react';
-import { render, findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
-import RenderContainer from '../RenderContainer';
 import RenderLayer from '../RenderLayer';
-import ZIndex from '../ZIndex';
+import RenderConatiner from '../RenderContainer';
 import Transition from 'react-addons-css-transition-group';
-import shallowEqual from 'fbjs/lib/shallowEqual';
 
 import PopupHelper from './PopupHelper';
 import PopupPin from './PopupPin';
@@ -17,29 +13,22 @@ import styles from './Popup.less';
 
 import { isIE, ieVerison } from '../ensureOldIEClassName';
 
-function getTempNode() {
-  let tempNode = document.createElement('div');
-  tempNode.style.opacity = '0';
-  tempNode.style.position = 'absolute';
-  tempNode.className = 'react-ui';
-  document.body && document.body.appendChild(tempNode);
-
-  return tempNode;
-}
+const noop = () => {};
 
 type Props = {
-  anchorElement: ?HTMLElement,
+  anchorElement: HTMLElement,
   backgroundColor: string,
   children: React.Node,
   hasPin: boolean,
   hasShadow: boolean,
   margin: number,
+  onClickOutside: () => void,
+  onFocusOutside: () => void,
   opened: boolean,
   pinOffset: number,
   pinSize: number,
   popupOffset: number,
-  positions: string[],
-  onCloseRequest?: () => void
+  positions: string[]
 };
 
 type State = {
@@ -60,7 +49,9 @@ export default class Popup extends React.Component<Props, State> {
     pinOffset: 16,
     hasPin: false,
     hasShadow: false,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    onClickOutside: () => {},
+    onFocusOutside: () => {}
   };
 
   state: State = {
@@ -70,88 +61,39 @@ export default class Popup extends React.Component<Props, State> {
   _popupElement: ?HTMLElement;
   _inQueue: boolean = false;
   _containerDidMount: boolean = false;
-  _tempNode: HTMLElement;
-
-  componentDidMount() {
-    this._tempNode = getTempNode();
-    this._preRender();
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (
-      this.props.opened !== prevProps.opened ||
-      this.props.anchorElement !== prevProps.anchorElement
-    ) {
-      this._preRender();
-    }
-  }
-
-  componentWillUnmount() {
-    if (this._tempNode) {
-      document.body && document.body.removeChild(this._tempNode);
-    }
-  }
-
-  _preRender() {
-    const tempNode = this._tempNode;
-    render(this._renderContent(this._getDummyLocation()), tempNode, () => {
-      this._calculateLocation(tempNode);
-    });
-  }
-
-  _calculateLocation(node) {
-    if (!this.props.opened && this.state.location) {
-      this.setState({ location: null });
-    }
-    const location = this._getLocation(node);
-    if (
-      !this.state.location ||
-      !location ||
-      location.position !== this.state.location.position ||
-      !shallowEqual(location.coordinates, this.state.location.coordinates)
-    ) {
-      this.setState({ location });
-    }
-  }
 
   render() {
-    const { opened } = this.props;
+    const { onClickOutside, onFocusOutside, opened } = this.props;
     if (!opened && !this._containerDidMount) {
       return null;
     }
-    const { location } = this.state;
-    const directionClass = location
-      ? location.position.split(' ')[0]
-      : 'bottom';
     return (
       <RenderLayer
-        onClickOutside={this._handleClickOutside}
-        onFocusOutside={this._handleFocusOutside}
-        active={this.props.onCloseRequest && this.props.opened}
+        onClickOutside={opened ? onClickOutside : noop}
+        onFocusOutside={opened ? onFocusOutside : noop}
       >
-        <RenderContainer ref={this._refContainer}>
+        <RenderConatiner ref={this._refContainer}>
           <Transition
-            transitionName={{
-              enter: styles['transition-enter-' + directionClass],
-              enterActive: styles['transition-enter-active'],
-              leave: styles['transition-leave'],
-              leaveActive: styles['transition-leave-active'],
-              appear: styles['transition-appear-' + directionClass],
-              appearActive: styles['transition-appear-active']
-            }}
+            transitionName="shift-fade-in-out"
             transitionAppear={true}
             transitionAppearTimeout={200}
             transitionEnterTimeout={200}
             transitionLeaveTimeout={200}
           >
-            {location ? this._renderContent(location) : null}
+            {this._renderContent()}
           </Transition>
-        </RenderContainer>
+        </RenderConatiner>
       </RenderLayer>
     );
   }
 
-  _renderContent(location) {
+  _renderContent() {
+    if (!this.props.opened) {
+      return null;
+    }
+
+    let location = this._getLocation() || this._getDummyLocation();
+
     let {
       hasPin,
       children,
@@ -174,14 +116,13 @@ export default class Popup extends React.Component<Props, State> {
           : 'transparent';
 
     return (
-      <ZIndex
-        delta={1000}
-        ref={e => (this._popupElement = e && (findDOMNode(e): any))}
+      <div
+        ref={e => (this._popupElement = e)}
         className={cn(styles.popup, hasShadow && styles.shadow)}
         style={style}
       >
         {children}
-        {hasPin && (
+        {hasPin &&
           <PopupPin
             popupElement={this._popupElement}
             popupPosition={location.position}
@@ -190,25 +131,10 @@ export default class Popup extends React.Component<Props, State> {
             borderWidth={hasShadow ? 1 : 0}
             backgroundColor={backgroundColor}
             borderColor={pinBorder}
-          />
-        )}
-      </ZIndex>
+          />}
+      </div>
     );
   }
-
-  _handleClickOutside = () => {
-    this._requestClose();
-  };
-
-  _handleFocusOutside = () => {
-    this._requestClose();
-  };
-
-  _requestClose = () => {
-    if (this.props.onCloseRequest) {
-      this.props.onCloseRequest();
-    }
-  };
 
   _refContainer = () => {
     this._containerDidMount = true;
@@ -217,36 +143,39 @@ export default class Popup extends React.Component<Props, State> {
   _getDummyLocation() {
     return {
       coordinates: {
-        top: -9999,
-        left: -9999
+        top: -999,
+        left: -999
       },
       position: 'top left'
     };
   }
 
-  _getLocation(node) {
-    if (!this.props.opened) {
-      return null;
+  _batchUpdate = () => {
+    if (this._inQueue) {
+      return;
     }
+    this._inQueue = true;
+    setTimeout(() => {
+      this.forceUpdate(() => {
+        this._inQueue = false;
+      });
+    }, 0);
+  };
 
-    const popupElement = this._popupElement;
-
-    if (!popupElement) {
+  _getLocation() {
+    const { _popupElement } = this;
+    if (!_popupElement) {
+      this._batchUpdate();
       return null;
     }
 
     const { anchorElement, positions, margin, popupOffset } = this.props;
-
-    if (!anchorElement) {
-      return null;
-    }
-
-    const anchorRect = PopupHelper.getElementAbsoluteRect(anchorElement);
-    const popupRect = PopupHelper.getElementAbsoluteRect(popupElement);
+    let anchorRect = PopupHelper.getElementAbsoluteRect(anchorElement);
+    let popupRect = PopupHelper.getElementAbsoluteRect(_popupElement);
 
     for (var i = 0; i < positions.length; ++i) {
-      const position = PopupHelper.getPositionObject(positions[i]);
-      const coordinates = this._getCoordinates(
+      let position = PopupHelper.getPositionObject(positions[i]);
+      let coordinates = this._getCoordinates(
         anchorRect,
         popupRect,
         position,
@@ -264,7 +193,7 @@ export default class Popup extends React.Component<Props, State> {
         return { coordinates, position: positions[i] };
       }
     }
-    const coordinates = this._getCoordinates(
+    let coordinates = this._getCoordinates(
       anchorRect,
       popupRect,
       PopupHelper.getPositionObject(positions[0]),
@@ -406,5 +335,15 @@ Popup.propTypes = {
    * С какой стороны показывать попап и край попапа,
    * на котором будет отображаться пин
    */
-  positions: PropTypes.array
+  positions: PropTypes.array,
+
+  /**
+   * Колбек для закрытия попапа при клике вне его области
+   */
+  onClickOutside: PropTypes.func,
+
+  /**
+   * Колбек для закрытия попапа при потери им фокуса
+   */
+  onFocusOutside: PropTypes.func
 };

@@ -6,8 +6,7 @@ import * as React from 'react';
 
 import Textarea from '../Textarea.adapter';
 
-// Not supporting React 16
-xdescribe('Textarea-adapter', () => {
+describe('Textarea-adapter', () => {
   testAdapter('getValue', mount => {
     const adapter = mount(<Textarea value="Kappa" />);
     expect(adapter.getValue()).toBe('Kappa');

@@ -1,22 +1,20 @@
 // @flow
-/* eslint-disable flowtype/no-weak-types */
 
 import * as React from 'react';
-import { findDOMNode } from 'react-dom';
+
 import PropTypes from 'prop-types';
 
 import RenderContainer from '../RenderContainer/RenderContainer';
 import position from '../Tooltip/position';
 import type { Result } from '../Tooltip/position';
 import renderPin from '../Tooltip/renderPin';
-import ZIndex from '../ZIndex';
 
 import styles from './HintBox.less';
 
 type Props = {
   getTarget: () => ?HTMLElement,
   pos: 'top' | 'right' | 'bottom' | 'left',
-  text: React.Node,
+  text: string,
   maxWidth: string | number
 };
 
@@ -26,7 +24,8 @@ type State = {
 
 export default class HintBox extends React.Component<Props, State> {
   static contextTypes = {
-    insideFixedContainer: PropTypes.bool
+    insideFixedContainer: PropTypes.bool,
+    rt_inModal: PropTypes.bool
   };
 
   state: State = {
@@ -38,6 +37,7 @@ export default class HintBox extends React.Component<Props, State> {
 
   render() {
     let style = {
+      zIndex: this.context.rt_inModal ? 1100 : 900,
       maxWidth: this.props.maxWidth
     };
     let className = styles.root;
@@ -52,15 +52,10 @@ export default class HintBox extends React.Component<Props, State> {
 
     return (
       <RenderContainer>
-        <ZIndex
-          delta={1000}
-          ref={this._ref}
-          style={style}
-          className={className}
-        >
+        <div ref={this._ref} style={style} className={className}>
           {this.props.text}
           {renderPin(this.state.pos, styles.pin, styles.pinInner)}
-        </ZIndex>
+        </div>
       </RenderContainer>
     );
   }
@@ -73,8 +68,8 @@ export default class HintBox extends React.Component<Props, State> {
     this._position();
   }
 
-  _ref = e => {
-    this._dom = e && (findDOMNode(e): any);
+  _ref = (el: ?HTMLElement) => {
+    this._dom = el;
   };
 
   _position() {

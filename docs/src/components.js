@@ -180,12 +180,6 @@ module.exports = [
     src: require('!raw!./snippets/Sticky-snip.js')
   },
   {
-    name: 'Switcher',
-    component: require('ui/Switcher').default,
-    info: require('!docgen!ui/Switcher/Switcher.js'),
-    src: require('!raw!./snippets/Switcher-snip.js')
-  },
-  {
     name: 'Tab',
     component: require('ui/Tabs/Tab').default,
     info: require('!docgen!ui/Tabs/Tab.js'),
@@ -202,12 +196,6 @@ module.exports = [
     component: require('ui/Textarea').default,
     info: require('!docgen!ui/Textarea/Textarea.js'),
     src: require('!raw!./snippets/Textarea-snip.js')
-  },
-  {
-    name: 'ThemeProvider',
-    component: require('ui/ThemeProvider').default,
-    info: { description: { tags: [] }, methods: [] },
-    src: require('!raw!./snippets/ThemeProvider-snip.js')
   },
   {
     name: 'Toast',

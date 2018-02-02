@@ -3,26 +3,16 @@
 var pathTo = require('./utils').pathTo;
 
 const KEBAB_SELECTOR = '[class^="Kebab-kebab"]';
-const KEBAB_MENU_SELECTOR = '[class^="Kebab-menu"]';
 
 var applyTest = testSuite =>
   testSuite
     .setCaptureElements('#test-element')
-    .before((actions, find) => {
-      this.kebab = find(KEBAB_SELECTOR);
-    })
     .capture('plain')
     .capture('hovered', (actions, find) => {
-      actions.mouseMove(this.kebab);
-    })
-    .capture('clickedOnButton2ndTime', (actions, find) => {
-      actions
-        .click(this.kebab)
-        .waitForElementToHide(KEBAB_MENU_SELECTOR)
-        .click(this.kebab);
+      actions.mouseMove(find(KEBAB_SELECTOR));
     })
     .capture('clicked', (actions, find) => {
-      actions.click(this.kebab);
+      actions.click(find(KEBAB_SELECTOR));
     })
     .capture('clickedOutside', (actions, find) => {
       actions.click(find('body'), 0, [1, 1]);

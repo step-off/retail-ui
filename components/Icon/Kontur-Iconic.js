@@ -220,12 +220,5 @@ export default {
   OkDouble: '\uE0D5',
   Key: '\uE0D6',
   USB: '\uE0D7',
-  DocumentTypeCsv: '\uE0D8',
-  Pause: '\uE0D9',
-  LinkOff: '\uE0DA',
-  BarcodeScanner: '\uE0DB',
-  Dot8LiteOff: '\uE0DC',
-  NotificationBellNone: '\uE0DD',
-  NotificationBellOn: '\uE0DE',
-  NotificationBellOff: '\uE0DF'
+  DocumentTypeCsv: '\uE0D8'
 };

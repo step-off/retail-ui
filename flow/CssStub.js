@@ -1,2 +1,3 @@
 /* @flow */
-module.exports = ({}: any);
+
+export default ({}: {[_: string]: string});

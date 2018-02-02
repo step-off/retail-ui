@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
-import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import { storiesOf, action } from '@storybook/react';
 import Toast from '../../Toast';
 import Button from '../../Button';
 import Modal from '../../Modal';
@@ -73,8 +72,8 @@ class TestNotifier extends React.Component<*, *> {
 storiesOf('Toast', module)
   .add('simple notifiacation', () => <TestNotifier />)
   .add('complex notifiacation', () => <TestNotifier complex />)
-  .add('static method', () => (
+  .add('static method', () =>
     <Button onClick={() => Toast.push('Static method call')}>
       Show static
     </Button>
-  ));
+  );

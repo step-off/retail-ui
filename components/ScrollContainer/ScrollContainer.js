@@ -72,14 +72,6 @@ export default class ScrollContainer extends React.Component {
       paddingRight: PADDING_RIGHT
     };
 
-    const innerProps = {
-      ref: this._refInner, 
-      className: styles.inner, 
-      style: innerStyle,
-      onWheel: this.props.preventWindowScroll ? this._handleInnerScrollWheel : null,
-      onScroll: this._handleNativeScroll
-    };
-
     return (
       <div
         className={styles.root}
@@ -87,7 +79,7 @@ export default class ScrollContainer extends React.Component {
         onMouseLeave={this._handleMouseLeave}
       >
         {scroll}
-        <div {...innerProps}>
+        <div ref={this._refInner} className={styles.inner} style={innerStyle}>
           {this.props.children}
         </div>
       </div>
@@ -96,22 +88,24 @@ export default class ScrollContainer extends React.Component {
 
   componentDidMount() {
     this._reflow();
+
+    events.addEventListener(this._inner, 'scroll', this._handleNativeScroll);
   }
 
   componentDidUpdate() {
     this._reflow();
   }
 
+  componentWillUnmount() {
+    events.removeEventListener(this._inner, 'scroll', this._handleNativeScroll);
+  }
+
   _refInner = el => {
     this._inner = el;
   };
 
-  _handleNativeScroll = event => {
+  _handleNativeScroll = () => {
     this._reflow();
-    if (this.props.preventWindowScroll) {
-      event.preventDefault();
-      return;
-    }
     LayoutEvents.emit();
   };
 
@@ -148,11 +142,7 @@ export default class ScrollContainer extends React.Component {
         });
       }
     } else {
-      this.setState({
-        scrollActive: false,
-        scrollSize: 0,
-        scrollPos: 0
-      });
+      this.setState({ scrollActive: false });
     }
   };
 
@@ -205,22 +195,6 @@ export default class ScrollContainer extends React.Component {
     event.preventDefault();
   };
 
-  _handleInnerScrollWheel = event => {
-    const inner = this._inner;
-
-    if (
-      event.deltaY > 0 &&
-      inner.scrollHeight <= inner.scrollTop + inner.offsetHeight
-    ) {
-      event.preventDefault();
-      return false;
-    }
-    if (event.deltaY < 0 && inner.scrollTop <= 0) {
-      event.preventDefault();
-      return false;
-    }
-  };
-
   _handleMouseMove = event => {
     const right =
       event.currentTarget.getBoundingClientRect().right - event.pageX;
@@ -240,9 +214,5 @@ export default class ScrollContainer extends React.Component {
 
 ScrollContainer.propTypes = {
   invert: PropTypes.bool,
-  maxHeight: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number
-  ]),
-  preventWindowScroll: PropTypes.bool
+  maxHeight: PropTypes.number
 };

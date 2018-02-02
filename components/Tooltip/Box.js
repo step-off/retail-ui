@@ -8,14 +8,14 @@ import throttle from 'lodash.throttle';
 
 import position from './position';
 import renderPin from './renderPin';
-import ZIndex from '../ZIndex';
 
 import '../ensureOldIEClassName';
 import styles from './Box.less';
 
 class Box extends React.Component {
   static contextTypes = {
-    insideFixedContainer: PropTypes.bool
+    insideFixedContainer: PropTypes.bool,
+    rt_inModal: PropTypes.bool
   };
 
   state = {
@@ -26,21 +26,21 @@ class Box extends React.Component {
 
   render() {
     const style = {
-      ...(this.state.pos ? this.state.pos.boxStyle : { left: 0, top: 0 })
+      ...(this.state.pos ? this.state.pos.boxStyle : { left: 0, top: 0 }),
+      zIndex: this.context.rt_inModal ? 1100 : 900
     };
 
     return (
-      <ZIndex delta={1000} className={styles.root} style={style}>
+      <div className={styles.root} style={style}>
         {renderPin(this.state.pos, styles.pin, styles.pinInner)}
         <div className={styles.inner}>
-          {this.props.close && (
+          {this.props.close &&
             <div className={styles.cross} onClick={this._handleCrossClick}>
               {CROSS}
-            </div>
-          )}
+            </div>}
           {this.props.children}
         </div>
-      </ZIndex>
+      </div>
     );
   }
 
@@ -76,9 +76,6 @@ class Box extends React.Component {
       return;
     }
     const of = this.props.getTarget();
-    if (!of) {
-      return;
-    }
     const el = ReactDOM.findDOMNode(this);
     const fixed = this.context.insideFixedContainer === true;
     const pos = position(el, of, this.props.pos, fixed);

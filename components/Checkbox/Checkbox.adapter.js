@@ -1,15 +1,18 @@
+/* @flow */
+
 import Checkbox from './Checkbox.js';
 
 const CheckboxAdapter = {
-  isChecked(inst) {
+  isChecked(inst: Checkbox) {
     return inst.props.checked;
   },
 
-  setChecked(inst, checked) {
-    inst._handleChange({ currentTarget: { checked } });
+  setChecked(inst: Checkbox, checked) {
+    inst._handleChange({ target: { checked } });
   }
 };
 
-Checkbox.__ADAPTER__ = CheckboxAdapter;
+// eslint-disable-next-line flowtype/no-weak-types
+(Checkbox: any).__ADAPTER__ = CheckboxAdapter;
 
 export default Checkbox;

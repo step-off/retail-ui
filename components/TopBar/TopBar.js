@@ -208,7 +208,7 @@ TopBar.propTypes = {
    * Компонент используемый для рендеринга ссылки.
    * Нужно переопределить если вы хотите подставить ссылку для роутера
    */
-  logoComponent: PropTypes.any,
+  logoComponent: PropTypes.object,
 
   logoHref: PropTypes.string,
 
@@ -237,7 +237,7 @@ TopBar.propTypes = {
   /**
    * Суффикс логотипа
    */
-  suffix: PropTypes.string,
+  suffix: PropTypes.string.isRequired,
 
   /**
    * Имя пользователя
@@ -247,7 +247,7 @@ TopBar.propTypes = {
   /**
    * Функция выхода
    */
-  onLogout: PropTypes.func
+  onLogout: PropTypes.func.isRequired
 };
 
 export default TopBar;

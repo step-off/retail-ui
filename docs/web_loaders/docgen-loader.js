@@ -1,4 +1,6 @@
 var doctrine = require('doctrine');
+var extractAdapterDoc = require('../src/extractAdapterDoc');
+var fs = require('fs');
 var marked = require('marked');
 var reactDocs = require('react-docgen');
 
@@ -20,6 +22,14 @@ module.exports = function(src) {
     info.props[prop].description = processDescription(
       info.props[prop].description
     );
+  }
+
+  const adapterPath = this.resourcePath.replace(/\.js$/, '.adapter.js');
+  if (fs.existsSync(adapterPath)) {
+    this.addDependency(adapterPath);
+
+    const src = fs.readFileSync(adapterPath, 'utf8');
+    info.adapterProps = extractAdapterDoc(src);
   }
 
   return 'module.exports = ' + JSON.stringify(info) + ';';

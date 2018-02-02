@@ -51,7 +51,7 @@ class Toast extends Component<Props, State> {
   }
 
   /**
-   * @public
+   * @api
    */
   static push(notification: string, action?: Action) {
     ToastStatic.push(notification, action);
@@ -71,7 +71,7 @@ class Toast extends Component<Props, State> {
   }
 
   /**
-   * @public
+   * @api
    */
   static close() {
     ToastStatic.close();

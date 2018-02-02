@@ -6,8 +6,7 @@ import * as React from 'react';
 
 import Modal from '../Modal.adapter.js';
 
-// Not supporting React 16
-xdescribe('Modal-adapter', () => {
+describe('Modal-adapter', () => {
   testAdapter('close', mount => {
     const onClose = jest.fn();
     const adapter = mount(<Modal onClose={onClose} />);

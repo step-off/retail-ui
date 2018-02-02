@@ -1,8 +1,4 @@
-@import "../variables.less";
-
-@show-transtion: transform 0.18s cubic-bezier(0.22, 0.61, 0.36, 1),
-  opacity 0.18s cubic-bezier(0.22, 0.61, 0.36, 1);
-@hide-transition: opacity 0.15s ease-out;
+@import '../variables.less';
 
 :local {
   .popup {
@@ -11,6 +7,7 @@
     max-width: 500px;
     background: @bg-default;
     border-radius: @popup-border-radius;
+    z-index: 900;
   }
 
   :global(.rt-ie-any) {
@@ -29,43 +26,33 @@
     filter: @popup-drop-shadow;
     -webkit-filter: @popup-drop-shadow;
   }
+}
 
-  .transition {
-    &-appear,
-    &-enter {
-      opacity: 0.01;
+@show-transtion:
+  transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1),
+  opacity 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+@hide-transition: opacity 0.15s ease-out;
 
-      &-top {
-        transform: translateY(10px);
-      }
+.shift-fade-in-out {
+  &-appear,
+  &-enter {
+    transform: translateY(-10px);
+    opacity: 0.01;
+  }
 
-      &-bottom {
-        transform: translateY(-10px);
-      }
+  &-appear-active,
+  &-enter-active {
+    transition: @show-transtion;
+    transform: translateY(0);
+    opacity: 1;
+  }
 
-      &-left {
-        transform: translateX(10px);
-      }
+  &-leave {
+    opacity: 1;
+  }
 
-      &-right {
-        transform: translateX(-10px);
-      }
-    }
-
-    &-appear-active,
-    &-enter-active {
-      transition: @show-transtion;
-      opacity: 1;
-      transform: translate(0, 0);
-    }
-
-    &-leave {
-      opacity: 1;
-    }
-
-    &-leave-active {
-      opacity: 0.01;
-      transition: @hide-transition;
-    }
+  &-leave-active {
+    opacity: 0.01;
+    transition: @hide-transition;
   }
 }

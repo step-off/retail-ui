@@ -26,10 +26,9 @@ const MyApp = () => (
 то необходимо подключить `regenerator-runtime` или `babel-polyfill`,
 например в `index.html`
 
-Квик-старт подойдёт, если вебпак настроен на сборку. Например, вы используете `create-react-app`. В противном случае добавьте в конфиг Вебпака `style-`, `css-` и `file-loader`.
 
 ### Слоу-старт
-Необходимо в [конфиг webpack](https://webpack.js.org/configuration/) добавить следующие лоадеры:
+Необходимо в [конфиг webpack](http://webpack.github.io/docs/configuration.html#module-loaders) добавить следующие лоадеры:
 ```javascript
 /* ... */
 module: {
@@ -37,32 +36,18 @@ module: {
   loaders: [
     {
       test: /\.jsx?$/,
-      use: [
-        {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              'env',
-              'react'
-            ],
-            plugins: [
-              'transform-object-rest-spread',
-              'transform-class-properties'
-            ]
-          }
-        }
-      ],
+      loader: 'babel-loader',
+      query: {
+        presets: ['es2015', 'stage-0', 'react']
+      },
       include: /retail-ui/
     },
     {
       test: /\.less$/,
-      use: ['style-loader', 'css-loader', 'less-loader'],
+      loaders: ['style', 'css', 'less'],
       include: /retail-ui/
     },
-    {
-      test: /\.(png|woff|woff2|eot)$/,
-      use: ['file-loader']
-    }
+    {test: /\.(png|woff|woff2|eot)$/, loader: "file-loader"}
   ]
   /* ... */
 }
@@ -77,29 +62,13 @@ module: {
 resolve: {
   /* ... */
   alias: {
-    'react-ui-theme.less': 'path-to-my-theme-variables.less'
+    'react-ui-theme': 'path-to-my-theme-variables.less'
   }
   /* ... */
 }
 /* ... */
 ```
 Список переменных можно глянуть в `components/variables.less`
-
-### Глобальные css-стили приложения портят внешний вид контролов
-Если библиотека используется в проекте с легаси, где стилизация сделана прямо по названиям тегов, то внешний вид контролов из библиотеки может сильно испортиться
-
-Если нет возможности разобрать легаси, то можно увеличить специфичность селекторов в библиотеке, тогда стили контролов будут приоритетнее стилей из легаси проекта
-
-Специфичность достигается за счет n-кратного повторения css-класса `react-ui` в селекторе стилей. Количество повторений задается через переменную `@specificity-level`, значение по умолчанию равно нулю, то есть по умолчанию css-класс `react-ui` никак ни на что не будет влиять
-
-Чтобы специфичность заработала в легаси проекте, react-блок, в котором используются компоненты из библиотеки, должен быть обернут в тег с css-классом `react-ui`
-
-Пример настройки специфичности
-```less
-/* ... */
-@specificity-level: 5;
-/* ... */
-```
 
 ### Не могу прокинуть css-класс компонентам. Как кастомизировать?
 Никак.

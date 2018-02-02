@@ -12,26 +12,19 @@ export type MenuItemState = null | 'hover' | 'selected' | void;
 const tagName = disabled => (disabled ? 'span' : 'a');
 
 type Props = {
-  /** @ignore */
   _enableIconPadding?: boolean,
-
-  /** @ignore */
   alkoLink?: boolean,
   comment?: React.Node,
   disabled?: boolean,
   href?: string,
   icon?: string,
-
-  /** @ignore */
   loose?: boolean,
-
-  /** @ignore */
   state?: MenuItemState,
   target?: string,
-  onClick?: (event: SyntheticEvent<HTMLElement>) => mixed,
-  onMouseDown?: (event: SyntheticEvent<HTMLElement>) => void,
-  onMouseEnter?: (event: SyntheticMouseEvent<HTMLElement>) => void,
-  onMouseLeave?: (event: SyntheticMouseEvent<HTMLElement>) => void,
+  onClick?: (event: SyntheticEvent<*>) => mixed,
+  onMouseDown?: (event: SyntheticEvent<*>) => void,
+  onMouseEnter?: (SyntheticMouseEvent<'span' | 'a'>) => void,
+  onMouseLeave?: (SyntheticMouseEvent<'span' | 'a'>) => void,
   children?: React.Node | ((state: MenuItemState) => React.Node)
 };
 
@@ -53,8 +46,10 @@ export default class MenuItem extends React.Component<Props> {
 
     icon: PropTypes.string,
 
+    /** internal */
     loose: PropTypes.bool,
 
+    /** internal */
     state: PropTypes.string,
 
     target: PropTypes.string,
@@ -67,26 +62,25 @@ export default class MenuItem extends React.Component<Props> {
       alkoLink,
       comment,
       disabled,
-      icon: iconName,
+      icon,
       loose,
       state,
-      children,
+
       onClick,
-      _enableIconPadding,
+
       ...rest
     } = this.props;
-
+    let { _enableIconPadding, children } = this.props;
     const hover = state === 'hover' && !disabled;
-
-    let icon = null;
-    if (iconName) {
-      icon = (
+    let $icon = null;
+    if (icon) {
+      _enableIconPadding = true;
+      $icon = (
         <div className={styles.icon}>
-          <Icon name={iconName} />
+          <Icon name={icon} />
         </div>
       );
     }
-
     const className = classNames({
       [styles.root]: true,
       [styles.disabled]: disabled,
@@ -94,12 +88,10 @@ export default class MenuItem extends React.Component<Props> {
       [styles.loose]: loose,
       [styles.selected]: state === 'selected',
       [styles.link]: alkoLink,
-      [styles.withIcon]: icon || _enableIconPadding
+      [styles.withIcon]: _enableIconPadding
     });
-
-    let content = children;
     if (typeof children === 'function') {
-      content = children(this.props.state);
+      children = children(this.props.state);
     }
 
     const Tag = tagName(disabled);
@@ -111,9 +103,9 @@ export default class MenuItem extends React.Component<Props> {
         tabIndex="-1"
         onClick={disabled ? null : onClick}
       >
-        {icon}
-        {content}
-        {this.props.comment && (
+        {$icon}
+        {children}
+        {this.props.comment &&
           <div
             className={classNames({
               [styles.comment]: true,
@@ -121,8 +113,7 @@ export default class MenuItem extends React.Component<Props> {
             })}
           >
             {comment}
-          </div>
-        )}
+          </div>}
       </Tag>
     );
   }

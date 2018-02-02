@@ -22,16 +22,12 @@ class Component extends React.Component {
 
   render() {
     return (
-      <div>
-        <PasswordInput
-          detectCapsLock
-          ref={ref => {
-            this._passwordInput = ref;
-          }}
-          value={this.state.value}
-          onChange={this._handleChange}
-        />
-      </div>
+      <PasswordInput
+        ref={ref => (this._passwordInput = ref)}
+        detectCapsLock
+        value={this.state.value}
+        onChange={this._handleChange}
+      />
     );
   }
 }

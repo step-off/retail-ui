@@ -6,8 +6,7 @@ import * as React from 'react';
 
 import DatePicker from '../DatePicker.adapter';
 
-// Not supporting React 16
-xdescribe('DatePicker-adapter', () => {
+describe('DatePicker-adapter', () => {
   testAdapter('getValue', mount => {
     const date = new Date();
     const adapter = mount(<DatePicker value={date} />);

@@ -7,11 +7,6 @@ let lastID = 0;
 function nextID() {
   return ++lastID;
 }
-function setID(id) {
-  lastID = id;
-}
-
-const REACT_16 = !!ReactDOM.createPortal;
 
 export default class RenderContainer extends React.Component<*> {
   _domContainer: HTMLElement;
@@ -22,7 +17,6 @@ export default class RenderContainer extends React.Component<*> {
     super(props, context);
 
     this._domContainer = document.createElement('div');
-    this._hydrateId();
 
     this._testID = nextID();
     this._domContainer.setAttribute(
@@ -31,53 +25,31 @@ export default class RenderContainer extends React.Component<*> {
     );
     this._domContainer.className = 'react-ui';
 
+    if (global.ReactTesting) {
+      global.ReactTesting.addRenderContainer(this._testID, this);
+    }
+  }
+
+  render() {
+    return <Portal rt_rootID={this._testID} />;
+  }
+
+  componentDidMount() {
     const { body } = document;
     if (!body) {
       throw Error('There is no "body" in "document"');
     }
     body.appendChild(this._domContainer);
 
-    if (global.ReactTesting) {
-      global.ReactTesting.addRenderContainer(this._testID, this);
-    }
-  }
-
-  _hydrateId() {
-    const nodes = document.querySelectorAll('[data-rendered-container-id]');
-    if (nodes.length === 0) {
-      return;
-    }
-    const lastNode = nodes[nodes.length - 1];
-    const containerId = +lastNode.getAttribute('data-rendered-container-id');
-    setID(containerId);
-  }
-
-  render() {
-    if (REACT_16) {
-      return [
-        ReactDOM.createPortal(this.props.children, this._domContainer),
-        <Portal key="portal-ref" rt_rootID={this._testID} />
-      ];
-    }
-    return <Portal rt_rootID={this._testID} />;
-  }
-
-  componentDidMount() {
-    if (!REACT_16) {
-      this._renderChild();
-    }
+    this._renderChild();
   }
 
   componentDidUpdate() {
-    if (!REACT_16) {
-      this._renderChild();
-    }
+    this._renderChild();
   }
 
   componentWillUnmount() {
-    if (!REACT_16) {
-      ReactDOM.unmountComponentAtNode(this._domContainer);
-    }
+    ReactDOM.unmountComponentAtNode(this._domContainer);
     if (this._domContainer.parentNode) {
       this._domContainer.parentNode.removeChild(this._domContainer);
     }

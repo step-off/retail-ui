@@ -1,12 +1,10 @@
 import * as React from 'react';
 
 export interface KebabProps {
-  disabled?: boolean;
+  disabled?: boolean,
   onClose?: () => void;
   onOpen?: () => void;
   size?: 'small' | 'large';
-  children?: React.ReactNode;
-  menuMaxHeight?: number | string;
 }
 
 export interface KebabState {

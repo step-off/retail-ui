@@ -1,13 +1,10 @@
 import * as React from 'react';
 
-import { SpinnerTypes } from '../Spinner';
-
 export interface LoaderProps {
   active: boolean;
   caption?: string;
   className?: string;
-  type?: SpinnerTypes;
-  children?: React.ReactNode;
+  type?: 'mini' | 'normal' | 'big';
 }
 
 export interface LoaderState {}

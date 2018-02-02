@@ -8,8 +8,7 @@ import Select from '../Select.adapter.js';
 
 const items = [['one', 'One'], ['two', 'Two'], ['three', 'Three']];
 
-// Not supporting React 16
-xdescribe('Select-adapter', () => {
+describe('Select-adapter', () => {
   testAdapter('getValue', mount => {
     const adapter = mount(<Select value="two" items={[]} />);
     expect(adapter.getValue()).toBe('two');

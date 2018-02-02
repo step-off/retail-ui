@@ -15,28 +15,28 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={5} activePage={1} onPageChange={() => {}} />
     );
-    expect(wrapper.find(`span.${PagingStyles.pageLink}`)).toHaveLength(5);
+    expect(wrapper.find(`.${PagingStyles.pageLink}`)).toHaveLength(5);
   });
 
   it('renders right dots', () => {
     const wrapper = mount(
       <Paging pagesCount={10} activePage={1} onPageChange={() => {}} />
     );
-    expect(wrapper.find(`span.${PagingStyles.dots}`)).toHaveLength(1);
+    expect(wrapper.find(`.${PagingStyles.dots}`)).toHaveLength(1);
   });
 
   it('renders left dots', () => {
     const wrapper = mount(
       <Paging pagesCount={10} activePage={9} onPageChange={() => {}} />
     );
-    expect(wrapper.find(`span.${PagingStyles.dots}`)).toHaveLength(1);
+    expect(wrapper.find(`.${PagingStyles.dots}`)).toHaveLength(1);
   });
 
   it('renders left and right dots', () => {
     const wrapper = mount(
       <Paging pagesCount={12} activePage={6} onPageChange={() => {}} />
     );
-    expect(wrapper.find(`span.${PagingStyles.dots}`)).toHaveLength(2);
+    expect(wrapper.find(`.${PagingStyles.dots}`)).toHaveLength(2);
   });
 
   it('calls onPageChange', () => {
@@ -44,10 +44,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={1} onPageChange={onPageChange} />
     );
-    wrapper
-      .find(`span.${PagingStyles.pageLink}`)
-      .at(1)
-      .simulate('click');
+    wrapper.find(`.${PagingStyles.pageLink}`).at(1).simulate('click');
     expect(onPageChange).toHaveBeenCalled();
   });
 
@@ -56,10 +53,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={1} onPageChange={onPageChange} />
     );
-    wrapper
-      .find(`span.${PagingStyles.pageLink}`)
-      .at(1)
-      .simulate('click');
+    wrapper.find(`.${PagingStyles.pageLink}`).at(1).simulate('click');
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
 
@@ -67,7 +61,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={1} onPageChange={() => {}} />
     );
-    expect(wrapper.find(`span.${PagingStyles.forwardLink}`)).toHaveLength(1);
+    expect(wrapper.find(`.${PagingStyles.forwardLink}`)).toHaveLength(1);
   });
 
   it('calls onPageChange when clicked on forward button', () => {
@@ -75,10 +69,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={1} onPageChange={onPageChange} />
     );
-    wrapper
-      .find(`span.${PagingStyles.forwardLink}`)
-      .at(0)
-      .simulate('click');
+    wrapper.find(`.${PagingStyles.forwardLink}`).at(0).simulate('click');
     expect(onPageChange).toHaveBeenCalled();
   });
 
@@ -87,10 +78,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={1} onPageChange={onPageChange} />
     );
-    wrapper
-      .find(`span.${PagingStyles.forwardLink}`)
-      .at(0)
-      .simulate('click');
+    wrapper.find(`.${PagingStyles.forwardLink}`).at(0).simulate('click');
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
 
@@ -110,7 +98,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={1} onPageChange={onPageChange} />
     );
-    const root = wrapper.find(`span.${PagingStyles.paging}`);
+    const root = wrapper.find(`.${PagingStyles.paging}`);
     root.simulate('keydown', { key: 'ArrowRight' });
     root.simulate('keydown', { key: 'Enter' });
     expect(onPageChange).toHaveBeenCalledWith(2);
@@ -121,7 +109,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={1} onPageChange={onPageChange} />
     );
-    const root = wrapper.find(`span.${PagingStyles.paging}`);
+    const root = wrapper.find(`.${PagingStyles.paging}`);
     root.simulate('keydown', { key: 'ArrowRight', ctrlKey: true });
     expect(onPageChange).toHaveBeenCalledWith(2);
   });
@@ -131,7 +119,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={2} onPageChange={onPageChange} />
     );
-    const root = wrapper.find(`span.${PagingStyles.paging}`);
+    const root = wrapper.find(`.${PagingStyles.paging}`);
     root.simulate('keydown', { key: 'ArrowLeft' });
     root.simulate('keydown', { key: 'Enter' });
     expect(onPageChange).toHaveBeenCalledWith(1);
@@ -142,7 +130,7 @@ describe('Pager', () => {
     const wrapper = mount(
       <Paging pagesCount={2} activePage={2} onPageChange={onPageChange} />
     );
-    const root = wrapper.find(`span.${PagingStyles.paging}`);
+    const root = wrapper.find(`.${PagingStyles.paging}`);
     root.simulate('keydown', { key: 'ArrowLeft', ctrlKey: true });
     expect(onPageChange).toHaveBeenCalledWith(1);
   });

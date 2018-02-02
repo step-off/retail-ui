@@ -1,13 +1,11 @@
 // @flow
-/* eslint-disable flowtype/no-weak-types */
 
 import * as React from 'react';
-import { findDOMNode } from 'react-dom';
+
+import PropTypes from 'prop-types';
 
 import LayoutEvents from '../../lib/LayoutEvents';
-import getComputedStyle from '../../lib/dom/getComputedStyle';
 import RenderContainer from '../RenderContainer/RenderContainer';
-import ZIndex from '../ZIndex';
 
 type Props = {
   align: 'left' | 'right',
@@ -20,15 +18,17 @@ type Props = {
 
 type State = {
   position: ?{
-    top: ?number,
-    bottom: ?number,
+    top: number | 'auto',
     left: ?number,
     right: ?number
-  },
-  hasStaticRoot?: boolean
+  }
 };
 
 export default class DropdownContainer extends React.Component<Props, State> {
+  static contextTypes = {
+    rt_inModal: PropTypes.bool
+  };
+
   static defaultProps = {
     align: 'left',
     disablePortal: false,
@@ -37,11 +37,10 @@ export default class DropdownContainer extends React.Component<Props, State> {
   };
 
   state: State = {
-    position: null,
-    hasStaticRoot: true
+    position: null
   };
 
-  _dom: ?HTMLElement;
+  _dom;
   _layoutSub;
 
   render() {
@@ -49,7 +48,8 @@ export default class DropdownContainer extends React.Component<Props, State> {
       position: 'absolute',
       top: '0',
       left: null,
-      right: null
+      right: null,
+      zIndex: this.context.rt_inModal ? 1100 : 900
     };
     if (this.state.position) {
       style = {
@@ -62,42 +62,32 @@ export default class DropdownContainer extends React.Component<Props, State> {
         ...style,
         ...{
           top: null,
-          bottom: null,
           minWidth: '100%'
         }
       };
     }
 
     const content = (
-      <ZIndex delta={1000} ref={this._ref} style={style}>
+      <div ref={this._ref} style={style}>
         {this.props.children}
-      </ZIndex>
+      </div>
     );
 
-    return this.props.disablePortal ? (
-      content
-    ) : (
-      <RenderContainer>{content}</RenderContainer>
-    );
+    return this.props.disablePortal
+      ? content
+      : <RenderContainer>
+          {content}
+        </RenderContainer>;
   }
 
-  _ref = e => {
-    this._dom = e && (findDOMNode(e): any);
+  _ref = (dom: ?HTMLElement) => {
+    this._dom = dom;
   };
 
   componentDidMount() {
     if (!this.props.disablePortal) {
       this._position();
       this._layoutSub = LayoutEvents.addListener(this._position);
-    }
-  }
-
-  componentWillMount() {
-    let htmlPosition = getComputedStyle(document.documentElement).position;
-    let bodyPosition = getComputedStyle(document.body).position;
-
-    if (htmlPosition !== 'static' || bodyPosition !== 'static') {
-      this.setState({ hasStaticRoot: false });
     }
   }
 
@@ -111,7 +101,6 @@ export default class DropdownContainer extends React.Component<Props, State> {
     // $FlowIssue
     const target: ?Element = this.props.getParent();
     const dom = this._dom;
-
     if (target && dom) {
       const targetRect = target.getBoundingClientRect();
       const docEl = document.documentElement;
@@ -125,7 +114,6 @@ export default class DropdownContainer extends React.Component<Props, State> {
 
       let left = null;
       let right = null;
-
       if (this.props.align === 'right') {
         const docWidth = docEl.offsetWidth || 0;
         right = docWidth - (targetRect.right + scrollX) + this.props.offsetX;
@@ -134,7 +122,6 @@ export default class DropdownContainer extends React.Component<Props, State> {
       }
 
       const { offsetY = 0 } = this.props;
-      let bottom = null;
       let top = targetRect.bottom + scrollY + offsetY;
 
       const distanceToBottom = docEl.clientHeight - targetRect.bottom;
@@ -142,37 +129,13 @@ export default class DropdownContainer extends React.Component<Props, State> {
       const dropdownHeight = this._getHeight();
 
       if (distanceToBottom < dropdownHeight && distanceToTop > dropdownHeight) {
-        top = null;
-
-        if (this.state.hasStaticRoot) {
-          bottom =
-            distanceToBottom -
-            scrollY +
-            offsetY +
-            targetRect.bottom -
-            targetRect.top;
-        } else {
-          let bodyScrollHeight = 0;
-          if (document.body) {
-            bodyScrollHeight = document.body.scrollHeight;
-          }
-
-          bottom =
-            bodyScrollHeight -
-            docEl.clientHeight -
-            scrollY +
-            distanceToBottom +
-            targetRect.bottom -
-            targetRect.top +
-            offsetY;
-        }
+        top = targetRect.top - this._getHeight() + scrollY - offsetY;
       }
 
       const position = {
         top,
         left,
         right,
-        bottom,
         minWidth: targetRect.right - targetRect.left
       };
       this.setState({ position });

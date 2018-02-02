@@ -28,30 +28,29 @@ describe('DatePicker', () => {
     expect(value.getUTCFullYear()).toBe(2013);
   });
 
-  it('set input value if new props come while editing', async () => {
+  it('set input value if new props come while editing', () => {
     const wrapper = mount(<DatePicker value={new Date()} />);
+    const input = wrapper.find('input');
 
-    wrapper.find('input').simulate('focus');
-    wrapper
-      .find('input')
-      .simulate('change', { currentTarget: { value: '1203' } });
+    input.simulate('focus');
+    input.simulate('change', { target: { value: '1203' } });
     wrapper.setProps({ value: new Date('02-01-2003 UTC') });
-    wrapper.update();
 
-    expect(wrapper.find('input').prop('value')).toBe('01.02.2003');
+    expect(input.prop('value')).toBe('01.02.2003');
 
     clickOutside();
 
-    expect(wrapper.find('input').prop('value')).toBe('01.02.2003');
+    expect(input.prop('value')).toBe('01.02.2003');
   });
 
   it('formats date correctly', () => {
     const wrapper = mount(<DatePicker value={new Date('02-01-2003 UTC')} />);
+    const input = wrapper.find('Input');
 
-    expect(wrapper.find('Input').prop('value')).toBe('01.02.2003');
+    expect(input.prop('value')).toBe('01.02.2003');
 
     // Make sure input is updated on rerender.
     wrapper.setProps({ value: new Date('03-02-2004 UTC') });
-    expect(wrapper.find('Input').prop('value')).toBe('02.03.2004');
+    expect(input.prop('value')).toBe('02.03.2004');
   });
 });
