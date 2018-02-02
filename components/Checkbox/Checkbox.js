@@ -8,6 +8,15 @@ import PropTypes from 'prop-types';
 
 import Icon from '../Icon';
 
+import '../ensureOldIEClassName';
+import Upgrades from '../../lib/Upgrades';
+
+const isFlatDisign = Upgrades.ifFlatDisignEnabled();
+
+const styles = isFlatDisign
+  ? require('./Checkbox.flat.less')
+  : require('./Checkbox.less');
+
 const KEYCODE_TAB = 9;
 
 let isListening: boolean;
@@ -22,18 +31,18 @@ function listenTabPresses() {
   }
 }
 
-import '../ensureOldIEClassName';
-import styles from './Checkbox.less';
-
 type Props = {
   checked?: boolean,
   children?: React.Node,
   disabled?: boolean,
   error?: boolean,
-  onChange?: (event: { target: { value: boolean } }, value: boolean) => void,
-  onMouseEnter?: (e: SyntheticMouseEvent<>) => void,
-  onMouseLeave?: (e: SyntheticMouseEvent<>) => void,
-  onMouseOver?: (e: SyntheticMouseEvent<>) => void,
+  onChange?: (
+    event: SyntheticMouseEvent<HTMLInputElement>,
+    value: boolean
+  ) => void,
+  onMouseEnter?: (e: SyntheticMouseEvent<HTMLInputElement>) => void,
+  onMouseLeave?: (e: SyntheticMouseEvent<HTMLInputElement>) => void,
+  onMouseOver?: (e: SyntheticMouseEvent<HTMLInputElement>) => void,
   warning?: boolean
 };
 
@@ -69,7 +78,7 @@ class Checkbox extends React.Component<
     const rootClass = classNames({
       [styles.root]: true,
       [styles.withoutCaption]: !hasCaption,
-      [styles.isChecked]: this.props.checked,
+      [styles.checked]: this.props.checked,
       [styles.disabled]: this.props.disabled,
       [styles.error]: this.props.error,
       [styles.warning]: this.props.warning,
@@ -94,11 +103,7 @@ class Checkbox extends React.Component<
 
     let caption = null;
     if (hasCaption) {
-      caption = (
-        <div className={styles.caption}>
-          {this.props.children}
-        </div>
-      );
+      caption = <div className={styles.caption}>{this.props.children}</div>;
     }
 
     return (
@@ -110,10 +115,11 @@ class Checkbox extends React.Component<
       >
         <input {...inputProps} />
         <span className={styles.box}>
-          {this.props.checked &&
+          {this.props.checked && (
             <div className={styles.ok}>
               <Icon name="ok" />
-            </div>}
+            </div>
+          )}
         </span>
         {caption}
       </label>
@@ -145,8 +151,8 @@ class Checkbox extends React.Component<
     this.input = ref;
   };
 
-  _handleChange = event => {
-    const checked = event.target.checked;
+  _handleChange = (event: SyntheticMouseEvent<HTMLInputElement>) => {
+    const checked = event.currentTarget.checked;
     this.props.onChange && this.props.onChange(event, checked);
   };
 }

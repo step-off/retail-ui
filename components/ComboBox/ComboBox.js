@@ -99,19 +99,25 @@ export type ExternalProps<T> = {
    */
   valueToString: (item: T) => string,
 
+  size?: 'small' | 'medium' | 'large',
+
   warning?: boolean,
 
   width?: string | number
 };
 
-const defaltReducer = createReducer(defaultReducers);
+const defaultReducer = createReducer(defaultReducers);
 const autocompleteReducer = createReducer(autocompleteReducers);
 
 class ComboBox<T> extends React.Component<ExternalProps<T>> {
   static defaultProps = {
+    // $FlowIssue
     itemToValue: x => x.value,
+    // $FlowIssue
     valueToString: x => x.label,
+    // $FlowIssue
     renderValue: x => x.label,
+    // $FlowIssue
     renderItem: x => x.label,
     menuAlign: 'left'
   };
@@ -119,8 +125,8 @@ class ComboBox<T> extends React.Component<ExternalProps<T>> {
   _cb: ?CustomComboBox = null;
 
   /**
-  * @api
-  */
+   * @public
+   */
   focus() {
     if (this._cb) {
       this._cb.focus();
@@ -132,7 +138,7 @@ class ComboBox<T> extends React.Component<ExternalProps<T>> {
     const props = {
       ...rest,
       openButton: !autocomplete,
-      reducer: autocomplete ? autocompleteReducer : defaltReducer
+      reducer: autocomplete ? autocompleteReducer : defaultReducer
     };
     return <CustomComboBox {...props} ref={cb => (this._cb = cb)} />;
   }

@@ -18,16 +18,16 @@ type InputProps = {
   disabled?: boolean,
   error?: boolean,
   id?: string,
-  leftIcon?: React.Element<React.ComponentType<mixed>>,
+  leftIcon?: React.Node,
   mask?: string,
   maskChar?: string,
   maxLength?: number | string,
   placeholder?: string,
-  rightIcon?: React.Element<React.ComponentType<mixed>>,
+  rightIcon?: React.Node,
   size?: 'small' | 'medium' | 'large',
   title?: string,
   type?: 'password' | 'text',
-  value?: string,
+  value: string,
   warning?: boolean,
   width?: number | string,
   onBlur?: (e: Event) => void,
@@ -47,7 +47,7 @@ type InputProps = {
 type Props = InputProps & {
   renderItem: (item: string) => React.Node,
   source: Array<string> | ((patter: string) => Promise<string[]>),
-  onChange?: (event: { target: { value: string } }, value: string) => void
+  onChange: (event: { target: { value: string } }, value: string) => void
 };
 
 type State = {
@@ -97,7 +97,7 @@ export default class Autocomplete extends React.Component<Props, State> {
   _input: ?Input = null;
 
   /**
-   * @api
+   * @public
    */
   focus() {
     if (this._input) {
@@ -109,9 +109,6 @@ export default class Autocomplete extends React.Component<Props, State> {
     const inputProps = {
       onChange: this._handleChange,
       onKeyDown: this._handleKey,
-      onMouseEnter: this.props.onMouseEnter,
-      onMouseLeave: this.props.onMouseLeave,
-      onMouseOver: this.props.onMouseOver,
       ref: this._refInput
     };
     return (
@@ -169,7 +166,9 @@ export default class Autocomplete extends React.Component<Props, State> {
   _handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
     this._opened = true;
 
-    const value: string = event.target.value;
+    // https://github.com/airbnb/enzyme/issues/218
+    // TODO: replace with currentTarget when fixed
+    const value = event.target.value;
 
     this._updateItems(value);
 
@@ -185,7 +184,7 @@ export default class Autocomplete extends React.Component<Props, State> {
     }
   };
 
-  _handleKey = (event: SyntheticKeyboardEvent<>) => {
+  _handleKey = (event: SyntheticKeyboardEvent<*>) => {
     var items = this.state.items;
     var stop = false;
     if ((event.key === 'ArrowUp' || event.key === 'ArrowDown') && items) {
@@ -294,6 +293,6 @@ function match(pattern, items) {
   return Promise.resolve(filteredItems);
 }
 
-function renderItem(item) {
+function renderItem(item: *) {
   return item;
 }
