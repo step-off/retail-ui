@@ -11,14 +11,14 @@ import { EventSubscription } from 'fbemitter';
 
 import styles = require('./Modal.less');
 import { ModalContext, ModalContextProps } from './ModalContext';
-import { Footer, FooterProps } from './ModalFooter';
-import { Header, HeaderProps } from './ModalHeader';
+import { Footer } from './ModalFooter';
+import { Header } from './ModalHeader';
 import { Body } from './ModalBody';
-import Close from './ModalClose';
+
 import cn from 'classnames';
 import Upgrades from '../../lib/Upgrades';
 import FocusLock from 'react-focus-lock';
-import ModalChildEmitter from './ModaChildEmitter';
+// import ModalChildEmitter from './ModaChildEmitter';
 
 let mountedModalsCount = 0;
 
@@ -51,13 +51,6 @@ export interface ModalState {
   horizontalScroll: boolean;
 }
 
-interface ChildrenRenderState  {
-  child: 'header' | 'footer';
-  willMount?: boolean;
-  willUnmount?: boolean;
-  hasPanel?: boolean;
-}
-
 /**
  * Модальное окно
  *
@@ -78,18 +71,10 @@ class Modal extends React.Component<ModalProps, ModalState> {
   };
 
   private stackSubscription: EventSubscription | null = null;
-  private headerSubscription: EventSubscription | null = null;
-  private footerSubscription: EventSubscription | null = null;
   private centerDOM: Element | null = null;
-  private hasHeader = false;
-  private hasFooter = false;
-  private hasPanel = false;
 
   public componentWillMount() {
-    if (this.hasHeader && this.hasFooter && this.hasPanel && this.headerSubscription && this.footerSubscription) {
-
-    }
-    ModalChildEmitter.addListener('childRenderState', this.childrenRenderStateListener)
+    // TODO add set additionalPadding here
   }
 
   public componentDidMount() {
@@ -126,39 +111,15 @@ class Modal extends React.Component<ModalProps, ModalState> {
   }
 
   public render(): JSX.Element {
-    let hasHeader = false;
-    let hasFooter = false;
-    let hasPanel = false;
-
-    React.Children.toArray(this.props.children).forEach(child => {
-      if (isHeader(child)) {
-        hasHeader = true;
-      }
-      if (isFooter(child)) {
-        hasFooter = true;
-        if (child.props.panel) {
-          hasPanel = true;
-        }
-      }
-    });
-
     const modalContextProps: ModalContextProps = {
-      hasHeader,
-      horizontalScroll: this.state.horizontalScroll
-    };
-    if (hasHeader && !this.props.noClose) {
-      modalContextProps.close = {
+      horizontalScroll: this.state.horizontalScroll,
+      close: {
         disableClose: this.props.disableClose,
-        requestClose: this.requestClose
-      };
-    }
-    if (!hasFooter) {
-      modalContextProps.additionalPadding = true;
-    }
-    if (hasFooter && hasPanel) {
-      modalContextProps.additionalPadding = true;
-    }
-
+        requestClose: this.requestClose,
+        noClose: this.props.noClose
+      }
+    }; 
+    
     const style: { width?: number | string } = {};
     const containerStyle: { width?: number | string } = {};
     if (this.props.width) {
@@ -189,12 +150,6 @@ class Modal extends React.Component<ModalProps, ModalState> {
                   disabled={this.isDisableFocusLock()}
                   autoFocus={false}
                 >
-                  {!hasHeader && !this.props.noClose ? (
-                    <Close
-                      requestClose={this.requestClose}
-                      disableClose={this.props.disableClose}
-                    />
-                  ) : null}
                   <ModalContext.Provider value={modalContextProps}>
                     <div>
                       {' '}
@@ -275,38 +230,6 @@ class Modal extends React.Component<ModalProps, ModalState> {
   private isDisableFocusLock = () => {
     return !ReactDOM.createPortal;
   };
-
-  private childrenRenderStateListener = (childrenState: ChildrenRenderState): void => {
-    switch (childrenState.child) {
-        case 'header':
-          this.handleHeaderRenderStateChange(childrenState);
-          break;
-        case 'footer':
-          this.handleFooterRenderStateChange(childrenState);
-          break;
-    }
-  }
-
-  private handleHeaderRenderStateChange = (childrenState: ChildrenRenderState): void => {
-    if (childrenState.willMount) {
-      this.hasHeader = true;
-    }
-    if (childrenState.willUnmount) {
-      this.hasHeader = false;
-    }
-  }
-
-  private handleFooterRenderStateChange = (childrenState: ChildrenRenderState): void => {
-    if (childrenState.willMount) {
-      this.hasFooter = true;
-      if (childrenState.hasPanel) {
-        this.hasPanel = true;
-      }
-    }
-    if (childrenState.willUnmount) {
-      this.hasFooter = false;
-    }
-  }
 }
 
 Modal.Header = Header;
@@ -315,20 +238,20 @@ Modal.Footer = Footer;
 
 export default Modal;
 
-function isHeader(
-  child: React.ReactChild
-): child is React.ReactElement<HeaderProps> {
-  if (!React.isValidElement(child)) {
-    return false;
-  }
-  return child.type === Header;
-}
+// function isHeader(
+//   child: React.ReactChild
+// ): child is React.ReactElement<HeaderProps> {
+//   if (!React.isValidElement(child)) {
+//     return false;
+//   }
+//   return child.type === Header;
+// }
 
-function isFooter(
-  child: React.ReactChild
-): child is React.ReactElement<FooterProps> {
-  if (!React.isValidElement(child)) {
-    return false;
-  }
-  return child.type === Footer;
-}
+// function isFooter(
+//   child: React.ReactChild
+// ): child is React.ReactElement<FooterProps> {
+//   if (!React.isValidElement(child)) {
+//     return false;
+//   }
+//   return child.type === Footer;
+// }

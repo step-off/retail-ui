@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { ModalContext } from './ModalContext';
+import { ModalContext, ModalContextProps } from './ModalContext';
 import Sticky from '../Sticky';
 import classNames from 'classnames';
 import Close from './ModalClose';
-import ModalChildEmitter from './ModaChildEmitter';
+import { Emitter, ChildrenActions } from './ModaChildEmitter';
 
 import styles = require('./Modal.less');
 
@@ -12,41 +12,45 @@ export interface HeaderProps {
 }
 
 export class Header extends React.Component<HeaderProps> {
+  private static additionalPadding = false;
+
   public componentWillMount() {
-    ModalChildEmitter.emit('childRenderState', {
-      child: 'header', 
-      willMount: true
+    Emitter.emit(ChildrenActions.HeaderMount);
+
+    Emitter.addListener(ChildrenActions.FooterMount, (params: {hasPanel: boolean}) => {
+      if (params.hasPanel) {
+        Header.additionalPadding = true;
+      }
+    });
+    
+    Emitter.addListener(ChildrenActions.FooterUnmount, () => {
+      Header.additionalPadding = true;
     });
   }
 
   public componentWillUnmount() {
-    ModalChildEmitter.emit('childRenderState', {
-      child: 'header', 
-      willUnmount: true
-    });
+    Emitter.emit(ChildrenActions.HeaderUnmount);
   }
 
   public render(): JSX.Element {
     return (
       <ModalContext.Consumer>
-        {({ close, additionalPadding }) => (
+        {(props: ModalContextProps) => (
           <Sticky side="top">
             {fixed => (
               <div
                 className={classNames(
                   styles.header,
                   fixed && styles.fixedHeader,
-                  additionalPadding && styles.headerAddPadding
+                  Header.additionalPadding && styles.headerAddPadding
                 )}
               >
-                {close && (
-                  <div className={styles.absoluteClose}>
+                <div className={styles.absoluteClose}>
                     <Close
-                      requestClose={close.requestClose}
-                      disableClose={close.disableClose}
+                      requestClose={props.close.requestClose}
+                      disableClose={props.close.disableClose}
                     />
                   </div>
-                )}
                 {this.props.children}
               </div>
             )}

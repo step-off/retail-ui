@@ -1,5 +1,7 @@
 import { EventEmitter } from 'fbemitter';
 
+
+
 class ModalChildEmitter extends EventEmitter {
     private static instance: EventEmitter | null = null; 
 
@@ -14,4 +16,10 @@ class ModalChildEmitter extends EventEmitter {
     }
 }
 
-export default new ModalChildEmitter()
+export const Emitter = new ModalChildEmitter();
+export enum ChildrenActions {
+    HeaderMount = 'header_mount',
+    HeaderUnmount = 'header_unmount',
+    FooterMount = 'footer_mount',
+    FooterUnmount = 'footer_unmount'
+}

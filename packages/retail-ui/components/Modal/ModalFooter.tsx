@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import Sticky from '../Sticky/Sticky';
 import styles = require('./Modal.less');
 import { ModalContext } from './ModalContext';
-import ModalChildEmitter from './ModaChildEmitter';
+import { Emitter, ChildrenActions } from './ModaChildEmitter';
 
 export interface FooterProps {
   /**
@@ -20,18 +20,11 @@ export class Footer extends React.Component<FooterProps> {
   private scrollbarWidth = getScrollWidth();
 
   public componentWillMount() {
-    ModalChildEmitter.emit('childRenderState', {
-      child: 'footer', 
-      willMount: true,
-      hasPanel: this.props.panel
-    });
+    Emitter.emit(ChildrenActions.FooterMount, {hasPanel: this.props.panel});
   }
 
   public componentWillUnmount() {
-    ModalChildEmitter.emit('childRenderState', {
-      child: 'footer', 
-      willUnmount: true
-    });
+    Emitter.emit(ChildrenActions.FooterUnmount);
   }
 
   public render(): JSX.Element {

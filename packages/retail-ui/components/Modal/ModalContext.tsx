@@ -5,14 +5,13 @@ import createReactContext = require('create-react-context');
 
 export interface CloseProps {
   disableClose?: boolean;
-  requestClose: () => void;
+  requestClose?: () => void;
+  noClose?: boolean;
 }
 
 export interface ModalContextProps {
-  additionalPadding?: boolean;
-  hasHeader?: boolean;
-  close?: CloseProps;
+  close: CloseProps;
   horizontalScroll?: boolean;
 }
 
-export const ModalContext = createReactContext<ModalContextProps>({});
+export const ModalContext = createReactContext<ModalContextProps>({close: {}});
