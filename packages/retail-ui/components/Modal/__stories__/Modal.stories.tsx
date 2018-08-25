@@ -8,6 +8,7 @@ import Input from '../../Input';
 import Textarea from '../../Textarea';
 import Toggle from '../../Toggle';
 import Upgrades from '../../../lib/Upgrades';
+import Gapped from '../../Gapped';
 
 const basicFontStyle = {
   fontSize: '14px',
@@ -306,18 +307,23 @@ class ModalWithoutFooter extends Component<{}, { opened: boolean }> {
   };
 }
 
-class ModalWithWrappedContent extends Component<{}, { opened: boolean }> {
+class ModalWithWrappedContent extends Component<{}, { opened: boolean, hasHeader: boolean; hasFooter: boolean; }> {
   public state = {
-    opened: true
+    opened: true,
+    hasHeader: true,
+    hasFooter: true
   };
 
   public renderModal() {
     return (
       <Modal onClose={this.close} width={500}>
         <div>
-          <Modal.Header>This modal has its content wrapped by div</Modal.Header>
+          {this.state.hasHeader && (
+            <Modal.Header>This modal has its content wrapped</Modal.Header>
+          )}
           <Modal.Body>
-            <p style={{ marginBottom: '100px' }}>
+            {this.buttons()}
+            <p style={{ marginBottom: '100px', marginTop: '20px' }}>
               On the other hand, we denounce with righteous indignation and
               dislike men who are so beguiled and demoralized by the charms of
               pleasure of the moment, so blinded by desire, that they cannot
@@ -354,9 +360,11 @@ class ModalWithWrappedContent extends Component<{}, { opened: boolean }> {
               pains to avoid worse pains.
             </p>
           </Modal.Body>
-          <Modal.Footer panel>
-            <Button onClick={this.close}>Закрыть</Button>
-          </Modal.Footer>
+          {this.state.hasFooter && (
+            <Modal.Footer panel>
+              <Button onClick={this.close}>Закрыть</Button>
+            </Modal.Footer>
+          )}
         </div>
       </Modal>
     );
@@ -378,6 +386,37 @@ class ModalWithWrappedContent extends Component<{}, { opened: boolean }> {
   public close = () => {
     this.setState({ opened: false });
   };
+
+  private removeHeader = () => {
+    this.setState({ hasHeader: false });
+  }
+
+  private repairHeader = () => {
+    this.setState({ hasHeader: true });
+  }
+  
+  private removeFooter = () => {
+    this.setState({ hasFooter: false });
+  }
+
+  private repairFooter = () => {
+    this.setState({ hasFooter: true });
+  }
+
+  private buttons = (): React.ReactNode => {
+    const {hasHeader, hasFooter} = this.state;
+
+    return (
+      <Gapped gap={10}>
+        <Button onClick={hasHeader ? this.removeHeader: this.repairHeader} size='large'>
+          {hasHeader ? 'Remove Header' : 'Repair Header'}
+        </Button>
+        <Button onClick={hasFooter ? this.removeFooter: this.repairFooter} size='large'>
+          {hasFooter ? 'Remove Footer' : 'Repair Footer'}
+        </Button>
+      </Gapped>
+    )
+  }
 }
 
 class ModalMobileView extends Component<{}, { opened: boolean }> {

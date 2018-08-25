@@ -18,6 +18,7 @@ import Close from './ModalClose';
 import cn from 'classnames';
 import Upgrades from '../../lib/Upgrades';
 import FocusLock from 'react-focus-lock';
+import ModalChildEmitter from './ModaChildEmitter';
 
 let mountedModalsCount = 0;
 
@@ -50,6 +51,13 @@ export interface ModalState {
   horizontalScroll: boolean;
 }
 
+interface ChildrenRenderState  {
+  child: 'header' | 'footer';
+  willMount?: boolean;
+  willUnmount?: boolean;
+  hasPanel?: boolean;
+}
+
 /**
  * Модальное окно
  *
@@ -70,7 +78,19 @@ class Modal extends React.Component<ModalProps, ModalState> {
   };
 
   private stackSubscription: EventSubscription | null = null;
+  private headerSubscription: EventSubscription | null = null;
+  private footerSubscription: EventSubscription | null = null;
   private centerDOM: Element | null = null;
+  private hasHeader = false;
+  private hasFooter = false;
+  private hasPanel = false;
+
+  public componentWillMount() {
+    if (this.hasHeader && this.hasFooter && this.hasPanel && this.headerSubscription && this.footerSubscription) {
+
+    }
+    ModalChildEmitter.addListener('childRenderState', this.childrenRenderStateListener)
+  }
 
   public componentDidMount() {
     this.stackSubscription = ModalStack.add(this, this.handleStackChange);
@@ -255,6 +275,38 @@ class Modal extends React.Component<ModalProps, ModalState> {
   private isDisableFocusLock = () => {
     return !ReactDOM.createPortal;
   };
+
+  private childrenRenderStateListener = (childrenState: ChildrenRenderState): void => {
+    switch (childrenState.child) {
+        case 'header':
+          this.handleHeaderRenderStateChange(childrenState);
+          break;
+        case 'footer':
+          this.handleFooterRenderStateChange(childrenState);
+          break;
+    }
+  }
+
+  private handleHeaderRenderStateChange = (childrenState: ChildrenRenderState): void => {
+    if (childrenState.willMount) {
+      this.hasHeader = true;
+    }
+    if (childrenState.willUnmount) {
+      this.hasHeader = false;
+    }
+  }
+
+  private handleFooterRenderStateChange = (childrenState: ChildrenRenderState): void => {
+    if (childrenState.willMount) {
+      this.hasFooter = true;
+      if (childrenState.hasPanel) {
+        this.hasPanel = true;
+      }
+    }
+    if (childrenState.willUnmount) {
+      this.hasFooter = false;
+    }
+  }
 }
 
 Modal.Header = Header;
