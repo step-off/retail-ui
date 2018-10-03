@@ -1,0 +1,65 @@
+@import '../variables.less';
+
+@show-transtion: transform 0.18s cubic-bezier(0.22, 0.61, 0.36, 1),
+  opacity 0.18s cubic-bezier(0.22, 0.61, 0.36, 1);
+@hide-transition: opacity 0.15s ease-out;
+
+:local {
+  .popup {
+    position: absolute;
+    min-width: 100px;
+    background: @bg-default;
+    border-radius: @popup-border-radius;
+  }
+
+  :global(.rt-ie-any) {
+    .shadow {
+      box-shadow: @popup-box-shadow;
+    }
+  }
+
+  :global(.rt-ie8) {
+    .popup {
+      border: 1px solid @tooltip-border;
+    }
+  }
+
+  .shadow {
+    filter: @popup-drop-shadow;
+    -webkit-filter: @popup-drop-shadow;
+  }
+
+  .transition {
+    &-enter {
+      opacity: 0.01;
+
+      &-top {
+        transform: translateY(10px);
+      }
+
+      &-bottom {
+        transform: translateY(-10px);
+      }
+
+      &-left {
+        transform: translateX(10px);
+      }
+
+      &-right {
+        transform: translateX(-10px);
+      }
+    }
+
+    &-enter-active {
+      transition: @show-transtion;
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+
+    &-exit {
+      opacity: 0.01;
+      transition: @hide-transition;
+      transform: translate(0, 0);
+    }
+  }
+}

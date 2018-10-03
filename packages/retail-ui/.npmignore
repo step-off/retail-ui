@@ -1,0 +1,13 @@
+.idea
+.vscode
+travis-deploy-key
+npm-debug.log
+coverage/
+gemini-report
+storybook-static
+__tests__
+__stories__
+__mocks__
+*.ts
+*.tsx
+!*.d.ts

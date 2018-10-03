@@ -1,0 +1,156 @@
+@import '../variables.less';
+
+@show-transtion: transform 0.18s cubic-bezier(0.22, 0.61, 0.36, 1),
+  opacity 0.18s cubic-bezier(0.22, 0.61, 0.36, 1);
+@hide-transition: opacity 0.15s ease-out;
+
+:local {
+  .layout {
+    border-spacing: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  .layoutItem {
+    padding: 0;
+    vertical-align: text-bottom;
+  }
+
+  .root {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+  }
+
+  .leftSide {
+    left: 0;
+    right: auto;
+  }
+
+  .leftSide .container {
+    float: left;
+  }
+
+  .background {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+
+    &.gray {
+      background: #333;
+      opacity: 0.6;
+      -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=60)';
+    }
+  }
+
+  .container {
+    position: relative;
+    float: right;
+    height: 100%;
+    background: @bg-default;
+    white-space: normal;
+    overflow-y: auto;
+
+    &.shadow {
+      box-shadow: @side_page-container-shadow;
+    }
+  }
+
+  .bodyContainer {
+    padding-left: 30px;
+    padding-right: 35px;
+  }
+
+  .header {
+    width: 100%;
+    font-size: 22px;
+    padding: 33px 0 30px 0;
+
+    &.fixed {
+      font-size: 18px;
+      background: @bg-default;
+      border-bottom: @border-color-gray-light solid 1px;
+      padding: 13px 0 13px 0;
+    }
+  }
+
+  .title {
+    padding-right: 70px;
+    padding-left: 30px;
+
+    &.fixed {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 24px;
+    }
+  }
+
+  .close {
+    color: @side_page-close-button-color;
+    float: right;
+    text-align: center;
+    text-decoration: none;
+    padding: 0 35px 0 30px;
+    font-size: 30px;
+    line-height: 0.7;
+
+    &:hover {
+      color: @side_page-close-button-hover-color;
+    }
+  }
+
+  .body {
+    height: 100%;
+  }
+
+  .footer {
+    padding: 20px 35px 20px 30px;
+
+    &.panel {
+      background: @side_page-footer-panel-bg;
+    }
+
+    &.fixed {
+      background: @bg-default;
+      border-top: @border-color-gray-light solid 1px;
+
+      &.panel {
+        border-top: 0;
+        background: @side_page-footer-panel-bg;
+      }
+    }
+  }
+
+  .transition {
+    &-appear,
+    &-enter {
+      opacity: 0.01;
+
+      &-left {
+        transform: translateX(100px);
+      }
+
+      &-right {
+        transform: translateX(-100px);
+      }
+    }
+
+    &-appear-active,
+    &-enter-active {
+      transition: @show-transtion;
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+
+    &-leave {
+      opacity: 1;
+    }
+
+    &-leave-active {
+      opacity: 0.01;
+      transition: @hide-transition;
+    }
+  }
+}
